@@ -1,0 +1,84 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+      	"navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/menu/index",
+      "style": {
+        "navigationBarTitleText": "点餐"
+      }
+    },
+    {
+      "path": "pages/order/index",
+      "style": {
+        "navigationBarTitleText": "订单"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationBarTitleText": "我的"
+      }
+    }
+  ],
+  // "subPackages": [
+  //   {
+  //     "root": "pages/order",
+  //     "pages": [
+  //       {
+  //         "path": "confirm/index",
+  //         "style": {
+  //           "navigationBarTitleText": "确认订单"
+  //         }
+  //       },
+  //       {
+  //         "path": "detail/index",
+  //         "style": {
+  //           "navigationBarTitleText": "订单详情"
+  //         }
+  //       }
+  //     ]
+  //   }
+  // ],
+  "tabBar": {
+    "color": "#c2c2c2",
+    "selectedColor": "#007f61",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "/static/images/footer/home.png",
+        "selectedIconPath": "/static/images/footer/home-green.png"
+      },
+      {
+        "pagePath": "pages/menu/index",
+        "text": "点餐",
+        "iconPath": "static/images/footer/menu.png",
+        "selectedIconPath": "static/images/footer/menu-green.png"
+      },
+      {
+        "pagePath": "pages/order/index",
+        "text": "取餐",
+        "iconPath": "static/images/footer/order.png",
+        "selectedIconPath": "static/images/footer/order-green.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "static/images/footer/my.png",
+        "selectedIconPath": "static/images/footer/my-green.png"
+      }
+    ]
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "1點點",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f5f5f5"
+  }
+}
