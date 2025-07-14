@@ -14,25 +14,36 @@ import { ref } from 'vue'
 const bannerList = ref([
 	{
 		id: 1,
-		imageUrl: '/static/images/banner/beijing.jpg',
+		imageUrl: '/static/images/banner/alittle-banner1.jpg',
 		link: '/pages/product/detail?id=1'
 	},
-	// {
-	// 	id: 2,
-	// 	imageUrl: '/static/images/banner/banner2.jpg',
-	// 	link: '/pages/product/detail?id=2'
-	// },
-	// {
-	// 	id: 3,
-	// 	imageUrl: '/static/images/banner/banner3.jpg',
-	// 	link: '/pages/product/detail?id=3'
-	// }
+	{
+		id: 2,
+		imageUrl: '/static/images/banner/alittle-banner2.jpg',
+		link: '/pages/product/detail?id=1'
+	},{
+		id: 3,
+		imageUrl: '/static/images/banner/alittle-banner3.jpg',
+		link: '/pages/product/detail?id=1'
+	},{
+		id: 4,
+		imageUrl: '/static/images/banner/alittle-banner4.jpg',
+		link: '/pages/product/detail?id=1'
+	},{
+		id: 5,
+		imageUrl: '/static/images/banner/alittle-banner5.jpg',
+		link: '/pages/product/detail?id=1'
+	},{
+		id: 6,
+		imageUrl: '/static/images/banner/alittle-banner6.jpg',
+		link: '/pages/product/detail?id=1'
+	},
 ])
 </script>
 
 <style lang="scss" scoped>
 .index {
-	padding: 20rpx;
+	// padding: 20rpx;
 
 	.banner-wrapper {
 		margin-bottom: 20rpx;

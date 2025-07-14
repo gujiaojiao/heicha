@@ -35,9 +35,9 @@ const onBannerClick = (item: BannerItem) => {
 <style lang="scss" scoped>
 .swiper-banner {
     width: 100%;
-    height: 300rpx;
     border-radius: 16rpx;
     overflow: hidden;
+    aspect-ratio: 1.3/1;
 
     .swiper {
         width: 100%;
@@ -47,6 +47,7 @@ const onBannerClick = (item: BannerItem) => {
     .banner-image {
         width: 100%;
         height: 100%;
+        object-fit: cover;
     }
 }
 </style>
