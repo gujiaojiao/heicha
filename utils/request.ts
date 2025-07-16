@@ -5,6 +5,12 @@ interface RequestOptions extends UniApp.RequestOptions {
   toast?: boolean
 }
 
+interface ApiResponse<T = any> {
+  code: number
+  data: T
+  message: string
+}
+
 const BASE_URL = 'https://api.example.com'
 
 class Request {
@@ -44,7 +50,7 @@ class Request {
       uni.hideLoading()
     }
 
-    const { statusCode, data } = response
+    const { statusCode, data } = response as { statusCode: number, data: ApiResponse }
 
     if (statusCode === 200) {
       if (data.code === 0) {
