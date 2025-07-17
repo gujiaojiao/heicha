@@ -102,3 +102,20 @@ export const getToolEntries = () => {
     }
   ])
 } 
+
+export const getActivityEntry=()=>{
+	return Promise.resolve({
+		publicBenefit:{
+			title:'公益助力',
+			subtitle:'点点公益献爱心'
+		},
+		inviteGift:{
+			title:'邀请好礼',
+			subtitle:'邀请好友赢好礼'
+		},
+		entry:{
+			title:'加盟咨询',
+			subtitle:'立即加盟咨询'
+		}
+	})
+}

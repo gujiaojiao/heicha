@@ -41,6 +41,13 @@
 				<text class="title">{{ tool.title }}</text>
 			</view>
 		</view>
+		
+		<!-- 活动加盟 -->
+		<view class="activity-entry">
+			<view class="public benefit">
+			</view>
+		</view>
+		
 	</view>
 </template>
 
@@ -253,6 +260,16 @@ export default {
 				font-size: 24rpx;
 				color: #333;
 			}
+		}
+	}
+	.activity-entry{
+		margin: 20rpx;
+		// background-color: #ffffff;
+		border-radius: 16rpx;
+		// padding: 30rpx;
+		.public-benefit{
+			background-color: #ffffff;
+			border-radius: 16rpx;
 		}
 	}
 }
