@@ -10,7 +10,38 @@ export interface UserInfo {
   couponCount: number
   avatar: string
 }
+export interface QuickEntry {
+	id: number
+	title: string
+	subtitle: string
+	icon: string
+	link: string
+}
 
+export interface ToolEntry {
+	id: number
+	title: string
+	icon: string
+	link: string
+}
+
+export interface ActivityEntry {
+	publicBenefit: {
+		title: string
+		subtitle: string
+		imageUrl: string
+	}
+	inviteGift: {
+		title: string
+		subtitle: string
+		imageUrl: string
+	}
+	entry: {
+		title: string
+		subtitle: string
+		imageUrl: string
+	}
+}
 export const getMockBanners = (): Promise<Banner[]> => {
   return Promise.resolve([
     {
@@ -107,15 +138,18 @@ export const getActivityEntry=()=>{
 	return Promise.resolve({
 		publicBenefit:{
 			title:'公益助力',
-			subtitle:'点点公益献爱心'
+			subtitle:'点点公益献爱心',
+			imageUrl: '/static/images/index/publicBenefit.png',
 		},
 		inviteGift:{
 			title:'邀请好礼',
-			subtitle:'邀请好友赢好礼'
+			subtitle:'邀请好友赢好礼',
+			imageUrl: '/static/images/index/inviteGift.png',
 		},
 		entry:{
 			title:'加盟咨询',
-			subtitle:'立即加盟咨询'
+			subtitle:'立即加盟咨询',
+			imageUrl: '/static/images/index/entry.png',
 		}
 	})
 }

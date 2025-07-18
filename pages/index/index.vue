@@ -1,6 +1,6 @@
 <template>
 	<view class="index">
-		<!-- 轮播图区域 -->
+		<!-- 顶部轮播图区域 -->
 		<view class="banner-wrapper">
 			<swiper-banner :banner-list="bannerList" />
 		</view>
@@ -41,67 +41,97 @@
 				<text class="title">{{ tool.title }}</text>
 			</view>
 		</view>
-		
+
 		<!-- 活动加盟 -->
-		<view class="activity-entry">
-			<view class="public benefit">
+		<view class="activity-entry" v-if="activityEntry">
+			<view class="activity-left">
+				<view class="activity-item">
+					<image class="activity-bg" :src="activityEntry.publicBenefit.imageUrl" mode="aspectFill" />
+					<view class="activity-content">
+						<text class="activity-title">{{ activityEntry.publicBenefit.title }}</text>
+						<text class="activity-subtitle">{{ activityEntry.publicBenefit.subtitle }}</text>
+					</view>
+				</view>
+			</view>
+			<view class="activity-right">
+				<view class="activity-item">
+					<image class="activity-bg" :src="activityEntry.inviteGift.imageUrl" mode="aspectFill" />
+					<view class="activity-content">
+						<text class="activity-title">{{ activityEntry.inviteGift.title }}</text>
+						<text class="activity-subtitle">{{ activityEntry.inviteGift.subtitle }}</text>
+					</view>
+				</view>
+				<view class="activity-item">
+					<image class="activity-bg" :src="activityEntry.entry.imageUrl" mode="aspectFill" />
+					<view class="activity-content">
+						<text class="activity-title">{{ activityEntry.entry.title }}</text>
+						<text class="activity-subtitle">{{ activityEntry.entry.subtitle }}</text>
+					</view>
+				</view>
 			</view>
 		</view>
 		
 	</view>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import SwiperBanner from '@/components/swiper-banner/index.vue'
-import { getMockBanners, getMockUserInfo, getQuickEntries, getToolEntries } from '@/utils/api/mock'
+import { getMockBanners, getMockUserInfo, getQuickEntries, getToolEntries, getActivityEntry } from '@/utils/api/mock'
+import type { Banner, UserInfo,QuickEntry,ToolEntry,ActivityEntry}from '@/utils/api/mock'
 
-export default {
-	components: {
-		SwiperBanner
-	},
-	data() {
-		return {
-			bannerList: [],
-			userInfo: null,
-			quickEntries: [],
-			toolEntries: []
-		}
-	},
-	async onLoad() {
-		try {
-			const [banners, user, entries, tools] = await Promise.all([
-				getMockBanners(),
-				getMockUserInfo(),
-				getQuickEntries(),
-				getToolEntries()
-			])
 
-			this.bannerList = banners
-			this.userInfo = user
-			this.quickEntries = entries
-			this.toolEntries = tools
-		} catch (error) {
-			console.error('加载数据失败：', error)
-		}
-	},
-	methods: {
-		navigateTo(url) {
-			uni.navigateTo({
-				url,
-				fail: (err) => {
-					console.error('页面跳转失败：', err)
-					uni.showToast({
-						title: '页面跳转失败',
-						icon: 'none'
-					})
-				}
-			})
-		},
-		navigateToCoupon() {
-			this.navigateTo('/pages/coupon/index')
-		}
+
+// 响应式数据
+const bannerList = ref<Banner[]>([])
+const userInfo = ref<UserInfo | null>(null)
+const quickEntries = ref<QuickEntry[]>([])
+const toolEntries = ref<ToolEntry[]>([])
+const activityEntry = ref<ActivityEntry | null>(null)
+
+// 加载数据
+const loadData = async () => {
+	try {
+		const [banners, user, entries, tools, activity] = await Promise.all([
+			getMockBanners(),
+			getMockUserInfo(),
+			getQuickEntries(),
+			getToolEntries(),
+			getActivityEntry()
+		])
+
+		bannerList.value = banners
+		userInfo.value = user
+		quickEntries.value = entries
+		toolEntries.value = tools
+		activityEntry.value = activity
+	} catch (error) {
+		console.error('加载数据失败：', error)
 	}
 }
+
+// 页面跳转
+const navigateTo = (url: string) => {
+	uni.navigateTo({
+		url,
+		fail: (err: UniApp.NavigateToFailCallback) => {
+			console.error('页面跳转失败：', err)
+			uni.showToast({
+				title: '页面跳转失败',
+				icon: 'none'
+			})
+		}
+	})
+}
+
+const navigateToCoupon = () => {
+	navigateTo('/pages/coupon/index')
+}
+
+// 生命周期
+onMounted(() => {
+	loadData()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -262,14 +292,104 @@ export default {
 			}
 		}
 	}
-	.activity-entry{
+
+	.activity-entry {
+		width: calc(100% - 40rpx);
 		margin: 20rpx;
-		// background-color: #ffffff;
-		border-radius: 16rpx;
-		// padding: 30rpx;
-		.public-benefit{
-			background-color: #ffffff;
-			border-radius: 16rpx;
+		display: flex;
+		flex-direction: row;
+		gap: 20rpx;
+		aspect-ratio: 2 / 1;
+
+		.activity-left {
+			flex: 1;
+			height: 100%;
+
+			.activity-item {
+				height: 100%;
+				position: relative;
+				border-radius: 16rpx;
+				overflow: hidden;
+
+				.activity-bg {
+					position: absolute;
+					left: 0;
+					top: 0;
+					width: 100%;
+					height: 100%;
+					z-index: 0;
+				}
+
+				.activity-content {
+					position: relative;
+					z-index: 1;
+					height: 100%;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: center;
+					transform: translateY(-30%);
+
+					.activity-title {
+						font-size: 32rpx;
+						font-weight: bold;
+						color: $uni-text-color-green;
+						margin-bottom: 8rpx;
+					}
+
+					.activity-subtitle {
+						font-size: 24rpx;
+						color: rgba(112, 190, 132, 0.9);
+					}
+				}
+			}
+		}
+
+		.activity-right {
+			flex: 1;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			gap: 20rpx;
+
+			.activity-item {
+				flex: 1;
+				position: relative;
+				border-radius: 16rpx;
+				overflow: hidden;
+
+				.activity-bg {
+					position: absolute;
+					left: 0;
+					top: 0;
+					width: 100%;
+					height: 100%;
+					z-index: 0;
+				}
+
+				.activity-content {
+					position: relative;
+					z-index: 1;
+					height: 100%;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: center;
+					transform: translateX(-20%);
+
+					.activity-title {
+						font-size: 32rpx;
+						font-weight: bold;
+						color: $uni-text-color-green;
+						margin-bottom: 8rpx;
+					}
+
+					.activity-subtitle {
+						font-size: 24rpx;
+						color: rgba(112, 190, 132, 0.9);
+					}
+				}
+			}
 		}
 	}
 }

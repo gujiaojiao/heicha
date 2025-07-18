@@ -13,8 +13,16 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "types": ["@dcloudio/types", "vite/client", "@vue/runtime-core"]
   },
-  "include": ["./**/*.ts", "./**/*.d.ts", "./**/*.tsx", "./**/*.vue"],
+  "include": [
+    "./**/*.ts",
+    "./**/*.d.ts",
+    "./**/*.tsx",
+    "./**/*.vue",
+    "env.d.ts",
+    "vite-env.d.ts"
+  ],
   "exclude": ["node_modules", "unpackage"]
 } 
