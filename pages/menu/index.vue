@@ -5,7 +5,7 @@
 			<view class="backToHome">
 				<uni-icons type="home" size="30"></uni-icons>
 			</view>
-			<text class="subtitle">选择门店</text>
+			<text class="subtitle">选择门店11111</text>
 		</view>
 
 		<view class="page-body">
