@@ -36,14 +36,21 @@
                 </view>
                 <view class="member-card__body">
                     <text class="expire-date">有效期：{{ memberInfo.expireDate }}</text>
-                    <view class="growth-bar">
+					<view class="growth" style="display: flex;justify-content: space-between;padding-top: 20rpx;">
+						<text class="growth-text">成长值：{{ memberInfo.growth.current }}/{{ memberInfo.growth.total }}</text>
+						<text class="next-level">还差{{ memberInfo.growth.total - memberInfo.growth.current }}成长值升级为{{
+						    memberInfo.nextLevel }}</text>
+					</view>
+                    <!-- <view class="growth-bar">
                         <view class="progress"
                             :style="{ width: (memberInfo.growth.current / memberInfo.growth.total * 100) + '%' }">
                         </view>
-                    </view>
-                    <text class="growth-text">成长值：{{ memberInfo.growth.current }}/{{ memberInfo.growth.total }}</text>
-                    <text class="next-level">还差{{ memberInfo.growth.total - memberInfo.growth.current }}成长值升级为{{
-                        memberInfo.nextLevel }}</text>
+                    </view> -->
+					<view class="progress-box">
+									<progress :percent="(memberInfo.growth.current / memberInfo.growth.total * 100)" 
+									stroke-width="4" activeColor="#fff" backgroundColor="rgba(255, 255, 255, 0.3)"
+									 active="true" border-radius="16rpx" />
+					</view>
                 </view>
             </view>
 
@@ -53,7 +60,8 @@
                 <view class="benefits-grid">
                     <view class="benefit-item" v-for="benefit in memberBenefits" :key="benefit.id"
                         @tap="navigateTo(benefit.link)">
-                        <view class="icon" :class="benefit.icon"></view>
+                        <!-- <view class="icon" :class="benefit.icon"></view> -->
+                        <image class="icon" :src="benefit.icon" mode="aspectFit" />
                         <text class="title">{{ benefit.title }}</text>
                     </view>
                 </view>
@@ -65,7 +73,8 @@
                 <view class="functions-grid">
                     <view class="function-item" v-for="func in mineFunctions" :key="func.id"
                         @tap="navigateTo(func.link)">
-                        <view class="icon" :class="func.icon"></view>
+                        <!-- <view class="icon" :class="func.icon"></view> -->
+                        <image class="icon" :src="func.icon" mode="aspectFit" />
                         <text class="title">{{ func.title }}</text>
                     </view>
                 </view>
@@ -159,8 +168,8 @@ onMounted(() => {
     }
 
     .user-info {
-		display: flex;
-		justify-content: space-between;
+        display: flex;
+        justify-content: space-between;
         background-color: rgba(255, 255, 255, 0.9);
         backdrop-filter: blur(10px);
         border-radius: 16rpx;
@@ -197,9 +206,8 @@ onMounted(() => {
 
         &__stats {
             display: flex;
-            // border-top: 1px solid #f5f5f5;
             padding-top: 20rpx;
-			gap:10px;
+            gap: 20px;
 
             .stat-item {
                 flex: 1;
@@ -221,7 +229,7 @@ onMounted(() => {
     }
 
     .member-card {
-        background-color: #07C160;
+        background-color: rgba(14, 158, 62, 0.75);
         border-radius: 16rpx;
         padding: 30rpx;
         color: #fff;
@@ -308,7 +316,7 @@ onMounted(() => {
                     background-size: contain;
                     background-repeat: no-repeat;
                     background-position: center;
-                    background-color: #f5f5f5; // 临时占位背景色
+                    // background-color: #f5f5f5; // 临时占位背景色
                 }
 
                 .title {
