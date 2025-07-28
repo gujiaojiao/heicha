@@ -70,7 +70,7 @@
 				</view>
 			</view>
 		</view>
-		
+
 	</view>
 </template>
 
@@ -78,7 +78,7 @@
 import { ref, onMounted } from 'vue'
 import SwiperBanner from '@/components/swiper-banner/index.vue'
 import { getMockBanners, getMockUserInfo, getQuickEntries, getToolEntries, getActivityEntry } from '@/utils/api/mock'
-import type { Banner, UserInfo,QuickEntry,ToolEntry,ActivityEntry}from '@/utils/api/mock'
+import type { Banner, UserInfo, QuickEntry, ToolEntry, ActivityEntry } from '@/utils/api/mock'
 
 
 
@@ -112,16 +112,32 @@ const loadData = async () => {
 
 // 页面跳转
 const navigateTo = (url: string) => {
-	uni.navigateTo({
-		url,
-		fail: (err: UniApp.NavigateToFailCallback) => {
-			console.error('页面跳转失败：', err)
-			uni.showToast({
-				title: '页面跳转失败',
-				icon: 'none'
-			})
-		}
-	})
+	// 判断是否是 tabBar 页面
+	const tabBarPages = ['/pages/index/index', '/pages/menu/index', '/pages/order/index', '/pages/mine/index']
+
+	if (tabBarPages.includes(url)) {
+		uni.switchTab({
+			url,
+			fail: (err) => {
+				console.error('页面跳转失败：', err)
+				uni.showToast({
+					title: '页面跳转失败',
+					icon: 'none'
+				})
+			}
+		})
+	} else {
+		uni.navigateTo({
+			url,
+			fail: (err) => {
+				console.error('页面跳转失败：', err)
+				uni.showToast({
+					title: '页面跳转失败',
+					icon: 'none'
+				})
+			}
+		})
+	}
 }
 
 const navigateToCoupon = () => {

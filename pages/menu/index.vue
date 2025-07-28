@@ -2,7 +2,7 @@
 	<view class="menu" :style="{ paddingTop: safeAreaInsets.top + 'px' }">
 		<!-- 顶部标签 -->
 		<view class="selectStore">
-			<view class="backToHome">
+			<view class="backToHome" @click="backToHome">
 				<uni-icons type="home" size="30"></uni-icons>
 			</view>
 			<text class="subtitle">选择门店</text>
@@ -34,7 +34,8 @@
 
 		<!-- 门店列表 -->
 		<view class="store-list">
-			<view class="store-card" v-for="(store, idx) in stores" :key="store.id">
+			<view class="store-card" v-for="(store, idx) in stores" :key="store.id"
+				:class="{ 'active': selectedStoreId === store.id }" @click="selectStore(store.id)">
 				<view class="uniui-left">
 					<view class="store-header">
 						<uni-icons type="star" size="18" color="#bbb" style="margin-right:4px;" />
@@ -52,10 +53,10 @@
 					<view class="store-actions">
 						<view class="status-btn">营业中</view>
 						<view class="order-btn">可外卖</view>
-						
+
 					</view>
 				</view>
-				
+
 				<view class="uniui-right">
 					<view class="go-order">去下单</view>
 					<text class="distance">距离{{ store.distance }}</text>
@@ -63,7 +64,7 @@
 						<uni-icons type="phone" size="20" color="#bbb" />
 						<uni-icons type="paperplane" size="20" color="#bbb" />
 					</view>
-					
+
 				</view>
 			</view>
 		</view>
@@ -73,25 +74,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onShow } from 'vue'
 import CartPreview from '@/components/cart-preview/cart-preview.vue'
+interface LocationRes {
+	longitude: number;
+	latitude: number;
+}
+
 const safeAreaInsets = (uni.getSystemInfoSync && uni.getSystemInfoSync().safeAreaInsets) || { top: 0 }
-const latitude = ref<number>(39.909)
-const longitude = ref<number>(116.39742)
+const latitude = ref<number>()
+const longitude = ref<number>()
 const covers = ref([
 	{
 		id: 0,
 		title: 'map',
 		latitude: 39.909,
 		longitude: 116.39742,
-		iconPath: '/static/images/menu/alittle.png'
+		iconPath: '/static/images/menu/alittle.png',
+		width: 32,
+		height: 32
 	},
 	{
 		id: 1,
 		title: 'map2',
 		latitude: 39.90,
 		longitude: 116.39,
-		iconPath: '/static/images/menu/alittle.png'
+		iconPath: '/static/images/menu/alittle.png',
+		width: 32,
+		height: 32
 	}
 ])
 const activeTab = ref(0)
@@ -115,6 +125,120 @@ const stores = ref([
 		distance: '2km',
 	},
 ])
+
+// 选中的店铺ID
+const selectedStoreId = ref(1) // 默认选中第一个店铺
+
+// 选择店铺
+const selectStore = (id: number) => {
+	selectedStoreId.value = id;
+	uni.navigateTo({
+		url: `/pages/menu/list?storeId=${id}`,
+		success: () => {
+			console.log('跳转成功')
+		},
+		fail: (err) => {
+			console.error('跳转失败：', err)
+		}
+	})
+}
+
+const backToHome = () => {
+	const url = '/pages/index/index'
+	uni.switchTab({
+		url,
+		fail: (err) => {
+			console.error('页面跳转失败')
+		}
+	})
+}
+
+const getLocation = async () => {
+	// #ifdef MP-WEIXIN
+	try {
+		const setting = await wx.getSetting()
+		console.log('获取设置信息：', setting)
+
+		if (setting.authSetting['scope.userLocation']) {
+			// 已经授权，直接获取位置
+			wx.getLocation({
+				type: 'gcj02',
+				isHighAccuracy: true,
+				success: function (res: LocationRes) {
+					console.log('定位成功：', res)
+					longitude.value = res.longitude
+					latitude.value = res.latitude
+					covers.value[0].latitude = res.latitude
+					covers.value[0].longitude = res.longitude
+				},
+				fail: function (err) {
+					console.error('定位失败：', err)
+					handleLocationError()
+				}
+			})
+		} else {
+			try {
+				await wx.authorize({ scope: 'scope.userLocation' })
+				getLocation() // 获取授权成功，重新获取位置
+			} catch (err) {
+				console.error('获取授权失败：', err)
+				handleLocationError()
+			}
+		}
+	} catch (err) {
+		console.error('获取设置信息失败：', err)
+		handleLocationError()
+	}
+	// #endif
+
+	// #ifndef MP-WEIXIN
+	uni.getLocation({
+		type: 'gcj02',
+		success: function (res: LocationRes) {
+			console.log('定位成功：', res)
+			longitude.value = res.longitude
+			latitude.value = res.latitude
+
+			// 更新地图标记点
+			covers.value[0].latitude = res.latitude
+			covers.value[0].longitude = res.longitude
+		},
+		fail: function (err) {
+			console.error('定位失败：', err)
+			handleLocationError()
+		}
+	})
+	// #endif
+}
+
+// 处理定位错误
+const handleLocationError = () => {
+	wx.showModal({
+		title: '提示',
+		content: '需要获取您的地理位置，请在设置中开启定位权限',
+		success: function (res) {
+			if (res.confirm) {
+				wx.openSetting({
+					success: function (res) {
+						console.log('打开设置页面成功')
+						if (res.authSetting['scope.userLocation']) {
+							// 用户在设置页面中允许了定位权限
+							getLocation()
+						}
+					}
+				})
+			}
+		}
+	})
+
+	longitude.value = 120.585316
+	latitude.value = 31.298886
+}
+
+onMounted(() => {
+	console.log('页面加载，准备获取位置')
+	getLocation()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -141,11 +265,13 @@ const stores = ref([
 			white-space: nowrap;
 		}
 	}
+
 	.menu-tabs {
 		width: 65%;
 		display: flex;
 		border-bottom: 1px solid #eee;
 		margin: 0 0 10px 0;
+
 		.tab {
 			flex: 1;
 			text-align: center;
@@ -153,9 +279,11 @@ const stores = ref([
 			font-size: 16px;
 			color: #888;
 			position: relative;
+
 			&.active {
 				color: #1aad19;
 				font-weight: bold;
+
 				&::after {
 					content: '';
 					display: block;
@@ -170,12 +298,14 @@ const stores = ref([
 			}
 		}
 	}
+
 	.search-bar {
 		display: flex;
 		align-items: center;
 		padding: 10px 16px 10px 16px;
 		background: #fff;
 		border-bottom: 1px solid #eee;
+
 		.search-location {
 			flex: 1;
 			font-size: 16px;
@@ -184,6 +314,7 @@ const stores = ref([
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}
+
 		.search-input {
 			display: flex;
 			align-items: center;
@@ -191,6 +322,7 @@ const stores = ref([
 			border-radius: 16px;
 			padding: 4px 10px;
 			margin-left: 10px;
+
 			.input {
 				border: none;
 				background: transparent;
@@ -200,33 +332,47 @@ const stores = ref([
 			}
 		}
 	}
+
 	.store-list {
 		margin: 10px 0 0 0;
+
 		.store-card {
 			background: #fff;
 			border-radius: 10px;
-			box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 			margin: 0 10px 16px 10px;
 			padding: 16px 12px 12px 12px;
 			position: relative;
 			display: flex;
-			.uniui-left{
+			border: 1rpx solid transparent;
+			transition: all 0.2s ease;
+
+			&.active,
+			&:active {
+				border-color: #007f61;
+			}
+
+			.uniui-left {
 				width: 60%;
 				margin-right: 20rpx;
+
 				.store-header {
 					display: flex;
 					align-items: center;
 					font-size: 18px;
 					font-weight: bold;
 					color: #222;
+
 					.selected-icon {
 						margin-left: auto;
 					}
 				}
+
 				.store-status-row {
 					display: flex;
 					align-items: center;
 					margin: 8px 0 4px 0;
+
 					.now-tag {
 						background: #1aad19;
 						color: #fff;
@@ -235,23 +381,28 @@ const stores = ref([
 						font-size: 13px;
 						margin-right: 6px;
 					}
+
 					.now-desc {
 						color: #007f61;
 						font-size: 14px;
 					}
+
 					.order-status {
 						color: #007f61;
 						font-size: 14px;
 					}
 				}
+
 				.store-address {
 					color: #888;
 					font-size: 14px;
 					margin-bottom: 8px;
 				}
+
 				.store-actions {
 					display: flex;
 					align-items: center;
+
 					.status-btn {
 						background: #e8f5e9;
 						color: #007f61;
@@ -260,6 +411,7 @@ const stores = ref([
 						font-size: 14px;
 						margin-right: 8px;
 					}
+
 					.order-btn {
 						background: #e8f5e9;
 						color: #007f61;
@@ -268,10 +420,11 @@ const stores = ref([
 						font-size: 14px;
 						margin-right: 8px;
 					}
-					
+
 				}
 			}
-			.uniui-right{
+
+			.uniui-right {
 				display: flex;
 				flex: 1;
 				flex-direction: column;
@@ -279,18 +432,21 @@ const stores = ref([
 				text-align: center;
 				justify-content: center;
 				align-items: center;
+
 				.go-order {
-					color:#007f61;
+					color: #007f61;
 					margin-right: 8px;
 					font-size: 15px;
 					font-weight: bold;
 				}
+
 				.distance {
 					color: #007f61;
 					font-size: 13px;
 					margin-right: 8px;
 				}
-				.info{
+
+				.info {
 					display: flex;
 					flex-direction: row;
 					margin-top: 20rpx;
@@ -298,13 +454,10 @@ const stores = ref([
 					justify-content: space-between;
 				}
 			}
-			
-			
-			
+
+
+
 		}
-		// .store-card :active{
-		// 	border:1rpx solid #007f61;
-		// }
 	}
 }
 </style>
