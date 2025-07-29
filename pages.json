@@ -16,8 +16,9 @@
     {
       "path": "pages/menu/list",
       "style": {
-        "navigationBarTitleText": "点餐",
-        "enablePullDownRefresh": true
+		  "navigationStyle": "custom"
+        // "navigationBarTitleText": "点餐",
+        // "enablePullDownRefresh": true
       }
     },
     {
@@ -65,7 +66,8 @@
         "selectedIconPath": "/static/images/footer/home-green.png"
       },
       {
-        "pagePath": "pages/menu/index",
+        "pagePath": "pages/menu/list",
+        
         "text": "点餐",
         "iconPath": "static/images/footer/menu.png",
         "selectedIconPath": "static/images/footer/menu-green.png"

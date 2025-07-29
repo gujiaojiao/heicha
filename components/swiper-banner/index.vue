@@ -37,8 +37,8 @@ const onBannerClick = (item: BannerItem) => {
     width: 100%;
     border-radius: 16rpx;
     overflow: hidden;
-    aspect-ratio: 1.3/1;
-
+    // aspect-ratio: 1.3/1;
+	aspect-ratio: 750/550;
     .swiper {
         width: 100%;
         height: 100%;

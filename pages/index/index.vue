@@ -116,7 +116,7 @@ const navigateTo = (url: string) => {
 	const tabBarPages = ['/pages/index/index', '/pages/menu/index', '/pages/order/index', '/pages/mine/index']
 
 	if (tabBarPages.includes(url)) {
-		uni.switchTab({
+		uni.navigateTo({
 			url,
 			fail: (err) => {
 				console.error('页面跳转失败：', err)

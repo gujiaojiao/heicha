@@ -132,7 +132,7 @@ const selectedStoreId = ref(1) // 默认选中第一个店铺
 // 选择店铺
 const selectStore = (id: number) => {
 	selectedStoreId.value = id;
-	uni.navigateTo({
+	uni.switchTab({
 		url: `/pages/menu/list?storeId=${id}`,
 		success: () => {
 			console.log('跳转成功')
@@ -246,7 +246,7 @@ onMounted(() => {
 
 	// 不需要再写 padding-top
 	.selectStore {
-		min-height: 50px;
+		min-height: 30px;
 		position: relative;
 
 		.backToHome {
