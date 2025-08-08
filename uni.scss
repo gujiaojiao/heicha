@@ -210,18 +210,18 @@ page {
   box-sizing: border-box;
 }
 
-/* 清除按钮默认样式 */
-button {
-  padding: 0;
-  margin: 0;
-  background: none;
-  border: none;
-  box-sizing: border-box;
+// /* 清除按钮默认样式 */
+// button {
+//   padding: 0;
+//   margin: 0;
+//   background: none;
+//   border: none;
+//   box-sizing: border-box;
   
-  &::after {
-    border: none;
-  }
-}
+//   &::after {
+//     border: none;
+//   }
+// }
 
 /* 图片默认样式 */
 image {

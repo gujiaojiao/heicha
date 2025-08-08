@@ -42,7 +42,7 @@ export const getOrderHistory = (): Promise<OrderHistory[]> => {
       products: [
         {
           name: "四季奶青",
-          imageUrl: "/static/images/index/drink.png",
+          imageUrl: "/static/images/index/20250501140430256.png",
           desc: "中杯/去冰/不另外加糖/波霸/椰果",
           count: 1,
           price: 0.00
@@ -60,7 +60,7 @@ export const getOrderHistory = (): Promise<OrderHistory[]> => {
       products: [
         {
           name: "四季奶青",
-          imageUrl: "/static/images/index/drink.png",
+          imageUrl: "/static/images/index/20250501140430256.png",
           desc: "中杯/常温/不另外加糖/波霸",
           count: 1,
           price: 0.00
@@ -78,7 +78,7 @@ export const getOrderHistory = (): Promise<OrderHistory[]> => {
       products: [
         {
           name: "四季奶青",
-          imageUrl: "/static/images/index/drink.png",
+          imageUrl: "/static/images/index/20250501140430256.png",
           desc: "中杯/常温/不另外加糖/波霸",
           count: 1,
           price: 0.00
