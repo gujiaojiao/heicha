@@ -39,6 +39,7 @@ export const getOrderHistory = (): Promise<OrderHistory[]> => {
       orderTime: "2025-07-23 12:18:12",
       status: "已完成",
       type: "自取",
+	  
       products: [
         {
           name: "四季奶青",
@@ -64,9 +65,16 @@ export const getOrderHistory = (): Promise<OrderHistory[]> => {
           desc: "中杯/常温/不另外加糖/波霸",
           count: 1,
           price: 0.00
-        }
+        },
+		{
+			name: "奶绿装芒",
+			imageUrl: "/static/images/index/20250501140430256.png",
+			desc: "中杯/去冰/不另外加糖/波霸",
+			count: 1,
+			price: 16.00
+		}
       ],
-      totalPrice: 0.00,
+      totalPrice: 16.00,
       buttonText: "再来一单"
     },
     {

@@ -28,12 +28,19 @@
 		"navigationStyle": "custom"
       }
     },
+	{
+		"path":"pages/order/historyOrderDetail",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	},
     {
       "path": "pages/mine/index",
       "style": {
        "navigationStyle": "custom"
       }
-    }
+    },
+	
   ],
   // "subPackages": [
   //   {

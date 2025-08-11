@@ -20,7 +20,7 @@
 			<!-- 历史订单 -->
 			<view class="historyOrder" v-if="activeTab === 1">
 				<view v-for="item in historyOrder" :key="item.id">
-					<view class="historyOrder__item">
+					<view class="historyOrder__item" @click="handleToDetail">
 						<view class="historyOrderItemcontent">
 							<view class="historyOrderItem">
 								<view class="addressName">{{ item.storeAddress }}</view>
@@ -33,18 +33,34 @@
 						<view v-if="item.products.length == 1">
 							<view class="product-list">
 								<image class="prod-img" :src="item.products[0].imageUrl" mode="aspectFill" />
+								<view class="singleOrder">
+									<view class="milkteaDetail" style="font-weight: 550;">
+										{{ item.products[0].name }}
+									</view>
+									<span style="font-size: 14px;">{{ item.products[0].desc }}</span>
+								</view>
+								<view class="total">
+									<span
+										style="font-size: 18px;font-weight: 600;">{{ item.totalPrice.toFixed(2) }}</span>
+									<span>共{{ item.products.length }}件</span>
+								</view>
 							</view>
 						</view>
-						<!-- 订单有23杯 -->
+						<!-- 订单有多杯 -->
 						<view v-if="item.products.length > 1">
-							<view v-for="pItem in item.products" :key="pItem.index">
 								<view class="product-list">
-									<image :src="pItem.imageUrl" mode="aspectFill" />
+									<view v-for="pItem in item.products" :key="pItem.index">
+									<image class="prod-img" :src="pItem.imageUrl" mode="aspectFill" />
+								</view>
+								<view class="total">
+									<span
+										style="font-size: 18px;font-weight: 600;">{{ item.totalPrice.toFixed(2) }}</span>
+									<span>共{{ item.products.length }}件</span>
 								</view>
 							</view>
 						</view>
 						<view class="orderAgain">
-							<button type="default" size="mini" plain="true">再来一单</button>
+							<button type="default" size="mini" plain="true" @click="handleToMenu">再来一单</button>
 						</view>
 					</view>
 				</view>
@@ -67,6 +83,26 @@ const historyOrder = ref([])
 const switchTab = (tabIndex: number) => {
 	activeTab.value = tabIndex
 	loadData()
+}
+
+const handleToDetail=()=>{
+	const url='/pages/order/historyOrderDetail'
+	uni.navigateTo({
+		url,
+		fail: (err) => {
+			console.error('页面跳转失败')
+		}
+	})
+	
+}
+const handleToMenu=()=>{
+	const url='/pages/menu/index'
+	uni.navigateTo({
+		url,
+		fail: (err) => {
+			console.error('页面跳转失败')
+		}
+	})
 }
 
 // 加载数据
@@ -186,16 +222,46 @@ onMounted(() => {
 						flex-direction: row;
 						justify-content: space-between;
 					}
+					.orderWay{
+						width: 12%;
+						text-align: center;
+						background-color: rgba(174, 213, 129,0.5);
+						border-radius: 5px;
+					}
 				}
 
 				.product-list {
+					display: flex;
+					flex-direction: row;
+					border-bottom: 1px solid #eee;
+
 					.prod-img {
-						width: 100px;
-						height: 100px;
+						width: 150rpx;
+						height: 150rpx;
 						margin-bottom: 10px;
 					}
 
-					border-bottom: 1px solid #eee;
+					.singleOrder {
+						// height: 150rpx;
+						display: flex;
+						flex-direction: column;
+						padding-top: 10px;
+						// justify-content: space-around;
+						font-size: 14px;
+						// margin: 5px 10px;
+
+					}
+
+					.total {
+						display: flex;
+						flex-direction: column;
+						padding-top: 10px;
+						// justify-content: space-around;
+						font-size: 14px;
+						flex: 1;
+						text-align: end;
+					}
+
 				}
 
 				.orderAgain {
