@@ -1,7 +1,7 @@
 <template>
-	<view class="menu-list" :style="{ paddingTop: safeAreaInsets.top + 'px' }">
+	<view class="menu-list">
 		<!-- 顶部搜索 -->
-		<view class="selectMenu">
+		<view class="selectMenu" :style="{ paddingTop: safeAreaInsets.top + 'px' }">
 			<view class="backToHome" @click="backToHome">
 				<uni-icons type="home" size="30"></uni-icons>
 			</view>
@@ -46,7 +46,7 @@
 				<view class="banner-swiper">
 					<swiper-banner :banner-list="banners" />
 				</view>
-				
+
 
 				<!-- 商品列表 -->
 				<view class="product-list">
@@ -103,17 +103,27 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .menu-list {
 	background: #f7f7f7;
-	min-height: 100vh;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
 
 	.selectMenu {
-		min-height: 30px;
-		position: relative;
+		position: fixed;
+		width: 100%;
+		// top: 0;
+		// left: 0;
+		// right: 0;
+		z-index: 100;
+		height: 50px;
+		background-color: white;
+		// position: relative;
 
 		.backToHome {
 			position: absolute;
 			left: 15rpx;
-			top: 50%;
-			transform: translateY(-50%);
+			// top: 50%;
+			// transform: translateY(-50%);
 		}
 
 		.search-bar {
@@ -125,8 +135,8 @@ onMounted(async () => {
 			border-radius: 16px;
 			padding: 6px 12px;
 			left: 50%;
-			top: 50%;
-			transform: translate(-50%, -50%);
+			// top: 50%;
+			transform: translateX(-50%);
 
 			.search-input {
 				border: none;
@@ -140,11 +150,12 @@ onMounted(async () => {
 
 	.store-bar {
 		display: flex;
-		margin-top: 25rpx;
+		margin-top: 60px;
 		justify-content: space-between;
 		align-items: center;
 		padding: 12px 16px 8px 16px;
 		background: #fff;
+		overflow: hidden;
 
 		.left {
 			display: flex;

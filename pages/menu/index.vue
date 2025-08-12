@@ -1,73 +1,81 @@
 <template>
 	<view class="menu" :style="{ paddingTop: safeAreaInsets.top + 'px' }">
-		<!-- 顶部标签 -->
-		<view class="selectStore">
-			<view class="backToHome" @click="backToHome">
-				<uni-icons type="home" size="30"></uni-icons>
+		<view class="fixed-area">
+			<!-- 顶部标签 -->
+			<view class="selectStore">
+				<view class="backToHome" @click="backToHome">
+					<uni-icons type="home" size="30"></uni-icons>
+				</view>
+				<text class="subtitle">选择门店</text>
 			</view>
-			<text class="subtitle">选择门店</text>
-		</view>
 
-		<!-- Tab切换 -->
-		<view class="menu-tabs">
-			<view :class="['tab', activeTab === 0 ? 'active' : '']" @click="activeTab = 0">选择门店</view>
-			<view :class="['tab', activeTab === 1 ? 'active' : '']" @click="activeTab = 1">收藏最爱</view>
-			<view :class="['tab', activeTab === 2 ? 'active' : '']" @click="activeTab = 2">按商品查</view>
-		</view>
-
-		<!-- 搜索栏 -->
-		<view class="search-bar">
-			<text class="search-location">苏州市苏州市住房公积…</text>
-			<view class="search-input">
-				<uni-icons type="search" size="18" color="#bbb" />
-				<input class="input" placeholder="搜索" />
+			<!-- Tab切换 -->
+			<view class="menu-tabs">
+				<view :class="['tab', activeTab === 0 ? 'active' : '']" @click="activeTab = 0">选择门店</view>
+				<view :class="['tab', activeTab === 1 ? 'active' : '']" @click="activeTab = 1">收藏最爱</view>
+				<view :class="['tab', activeTab === 2 ? 'active' : '']" @click="activeTab = 2">按商品查</view>
 			</view>
-		</view>
 
-		<!-- 地图 -->
-		<view class="page-body">
-			<view class="page-section page-section-gap">
-				<map style="width: 100%; height: 300px;" :latitude="latitude" :longitude="longitude" :markers="covers">
-				</map>
+			<!-- 搜索栏 -->
+			<view class="search-bar">
+				<text class="search-location">苏州市苏州市住房公积…</text>
+				<view class="search-input">
+					<uni-icons type="search" size="18" color="#bbb" />
+					<input class="input" placeholder="搜索" />
+				</view>
 			</view>
+
+			<!-- 地图 -->
+			<view class="page-body">
+				<view class="page-section page-section-gap">
+					<map style="width: 100%; height: 300px;" :latitude="latitude" :longitude="longitude"
+						:markers="covers">
+					</map>
+				</view>
+			</view>
+
 		</view>
 
-		<!-- 门店列表 -->
-		<view class="store-list">
-			<view class="store-card" v-for="(store, idx) in stores" :key="store.id"
-				:class="{ 'active': selectedStoreId === store.id }" @click="selectStore(store.id)">
-				<view class="uniui-left">
-					<view class="store-header">
-						<uni-icons type="star" size="18" color="#bbb" style="margin-right:4px;" />
-						<text class="store-title">{{ store.name }}</text>
-						<view v-if="idx === 0" class="selected-icon">
-							<uni-icons type="checkmark" size="20" color="#1aad19" />
+		<!-- 滚动区域 -->
+		<view class="scrollable-area">
+			<!-- 门店列表 -->
+			<view class="store-list">
+				<view class="store-card" v-for="(store, idx) in stores" :key="store.id"
+					:class="{ 'active': selectedStoreId === store.id }" @click="selectStore(store.id)">
+					<view class="uniui-left">
+						<view class="store-header">
+							<uni-icons type="star" size="18" color="#bbb" style="margin-right:4px;" />
+							<text class="store-title">{{ store.name }}</text>
+							<view v-if="idx === 0" class="selected-icon">
+								<uni-icons type="checkmark" size="20" color="#1aad19" />
+							</view>
+						</view>
+						<view class="store-status-row">
+							<text v-if="idx === 1" class="now-tag">NOW</text>
+							<text v-if="idx === 1" class="now-desc">现在下单，立即制作</text>
+							<text v-else class="order-status">1单/共1杯 制作中</text>
+						</view>
+						<view class="store-address">{{ store.address }}</view>
+						<view class="store-actions">
+							<view class="status-btn">营业中</view>
+							<view class="order-btn">可外卖</view>
+
 						</view>
 					</view>
-					<view class="store-status-row">
-						<text v-if="idx === 1" class="now-tag">NOW</text>
-						<text v-if="idx === 1" class="now-desc">现在下单，立即制作</text>
-						<text v-else class="order-status">1单/共1杯 制作中</text>
-					</view>
-					<view class="store-address">{{ store.address }}</view>
-					<view class="store-actions">
-						<view class="status-btn">营业中</view>
-						<view class="order-btn">可外卖</view>
+
+					<view class="uniui-right">
+						<view class="go-order">去下单</view>
+						<text class="distance">距离{{ store.distance }}</text>
+						<view class="info">
+							<uni-icons type="phone" size="20" color="#bbb" />
+							<uni-icons type="paperplane" size="20" color="#bbb" />
+						</view>
 
 					</view>
-				</view>
-
-				<view class="uniui-right">
-					<view class="go-order">去下单</view>
-					<text class="distance">距离{{ store.distance }}</text>
-					<view class="info">
-						<uni-icons type="phone" size="20" color="#bbb" />
-						<uni-icons type="paperplane" size="20" color="#bbb" />
-					</view>
-
 				</view>
 			</view>
 		</view>
+
 
 		<!-- <cart-preview /> -->
 	</view>
@@ -243,10 +251,25 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .menu {
+	display: flex;
+	flex-direction: column;
+	height: 100vh; // 占满整个视口高度
+	box-sizing: border-box;
+
+	.fixed-area {
+		flex-shrink: 0; // 防止收缩
+	}
+
+	.scrollable-area {
+		flex: 1; // 占据剩余空间
+		overflow-y: auto; // 启用垂直滚动
+		-webkit-overflow-scrolling: touch; // iOS平台平滑滚动
+	}
 
 	// 不需要再写 padding-top
 	.selectStore {
-		min-height: 30px;
+		position: fixed;
+		min-height: 45px;
 		position: relative;
 
 		.backToHome {
@@ -334,7 +357,11 @@ onMounted(() => {
 	}
 
 	.store-list {
+		flex: 1;
 		margin: 10px 0 0 0;
+		overflow: hidden;
+		overflow-y: auto;
+		min-height: 120px;
 
 		.store-card {
 			background: #fff;
