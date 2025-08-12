@@ -57,7 +57,7 @@
 								<text class="prod-name">{{ prod.name }}</text>
 								<text v-if="prod.isNew" class="prod-new">NEW</text>
 							</view>
-							<text class="prod-desc">{{ prod.desc }}</text>
+							<!-- <text class="prod-desc">{{ prod.desc }}</text> -->
 							<view class="prod-bottom">
 								<text class="prod-price">￥{{ prod.price.toFixed(2) }}</text>
 								<button class="add-btn" size="mini">+</button>
@@ -285,14 +285,15 @@ onMounted(async () => {
 				.product-item {
 					display: flex;
 					background: #fff;
-					border-radius: 12px;
+					border-radius: 5px;
 					margin-bottom: 16px;
 					overflow: hidden;
 					box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 
 					.prod-img {
-						width: 90px;
-						height: 90px;
+						padding:10px 0 10px  10px;
+						width: 80px;
+						height: 80px;
 						object-fit: cover;
 						border-radius: 12px 0 0 12px;
 					}

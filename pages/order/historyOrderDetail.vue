@@ -14,8 +14,17 @@
 				hhhhhrfrekfvrkcvhrevphu
 			</view>
 			<!-- 取餐方式-->
+			<view class="number">
+				hhhhhrfrekfvrkcvhrevphu
+			</view>
 			<!-- 订单详情 -->
+			<view class="number">
+				hhhhhrfrekfvrkcvhrevphu
+			</view>
 			<!-- 再来一单 -->
+			<view class="number">
+				hhhhhrfrekfvrkcvhrevphu
+			</view>
 		</view>
 
 	</view>
@@ -84,7 +93,7 @@ onMounted(() => {
 	.scroll-Content {
 		width: 100%;
 		flex: 1;
-		// min-height: 98%;
+		min-height: 98%;
 		display: flex;
 		flex-direction: column;
 		overflow-y: auto;
@@ -94,7 +103,7 @@ onMounted(() => {
 		margin-top: 10px;
 		.number {
 			width: 100%;
-			height: 30%;
+			height: 550px;
 			background-color: white;
 			border-radius: 3px;
 		}

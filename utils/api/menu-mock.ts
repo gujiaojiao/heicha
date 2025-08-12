@@ -40,7 +40,7 @@ export const getMenuProducts = (): Promise<MenuProduct[]> => {
       categoryId: 1,
       name: '007酸奶草莓绿',
       desc: '优选卡士007（7种活性益生菌）原味酸奶，搭配古茗茉莉花绿茶，草莓果肉',
-      imageUrl: '/static/images/index/20250325131008917.png',
+      imageUrl: '/static/images/menu/siji.png',
       price: 15.00,
       isNew: true
     },
@@ -49,7 +49,7 @@ export const getMenuProducts = (): Promise<MenuProduct[]> => {
       categoryId: 1,
       name: '夏蓉葡萄奶绿',
       desc: '精选优质巨峰葡萄与西班牙Bobal红葡萄特制原汁，饱含浓郁果香',
-      imageUrl: '/static/images/index/20250414100955506.png',
+      imageUrl: '/static/images/menu/manyuemei.png',
       price: 14.00,
       isNew: true
     },
@@ -58,7 +58,7 @@ export const getMenuProducts = (): Promise<MenuProduct[]> => {
       categoryId: 2,
       name: '贝此奶茶',
       desc: '经典奶茶，口感丝滑',
-      imageUrl: '/static/images/menu/alittle.png',
+      imageUrl: '/static/images/menu/mango.png',
       price: 12.00
     },
     {
@@ -66,7 +66,7 @@ export const getMenuProducts = (): Promise<MenuProduct[]> => {
       categoryId: 3,
       name: '花果奶茶A',
       desc: '花果香气，清新爽口',
-      imageUrl: '/static/images/index/20250501140430256.png',
+      imageUrl: '/static/images/menu/bale.png',
       price: 13.00
     },
     {
@@ -74,7 +74,7 @@ export const getMenuProducts = (): Promise<MenuProduct[]> => {
       categoryId: 4,
       name: '自助配奶茶',
       desc: '自选配料，DIY你的专属奶茶',
-      imageUrl: '/static/images/index/20250526134933719.jpg',
+      imageUrl: '/static/images/menu/hongchanaigai.png',
       price: 16.00
     },
     {
@@ -82,7 +82,7 @@ export const getMenuProducts = (): Promise<MenuProduct[]> => {
       categoryId: 5,
       name: '点口感奶茶',
       desc: '多种口感可选',
-      imageUrl: '/static/images/index/20250625133422909.jpg',
+      imageUrl: '/static/images/menu/mocha.png',
       price: 15.00
     }
   ])
