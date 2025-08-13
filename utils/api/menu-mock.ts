@@ -21,13 +21,13 @@ export const getMenuCategories = (): Promise<MenuCategory[]> => {
   return Promise.resolve([
     { id: 1, name: '新品上市', icon: 'NEW' },
     { id: 2, name: '只此系列', icon: '/static/images/menu/alittle.png' },
-    { id: 3, name: '花果奶茶', icon: '/static/images/menu/alittle.png' },
-    { id: 4, name: '奶茶自助配', icon: '/static/images/menu/alittle.png' },
-    { id: 5, name: '点口感', icon: '/static/images/menu/alittle.png' },
+    { id: 3, name: '人气推荐', icon: '/static/images/menu/alittle.png' },
+    { id: 4, name: '花果奶茶', icon: '/static/images/menu/alittle.png' },
+    { id: 5, name: '奶茶自由配', icon: '/static/images/menu/alittle.png' },
 	{ id: 6, name: '点口感', icon: '/static/images/menu/alittle.png' },
-	{ id: 7, name: '点口感', icon: '/static/images/menu/alittle.png' },
-	{ id: 8, name: '点口感', icon: '/static/images/menu/alittle.png' },
-	{ id: 9, name: '点口感', icon: '/static/images/menu/alittle.png' },
+	{ id: 7, name: '好茶自由配', icon: '/static/images/menu/alittle.png' },
+	{ id: 8, name: '点果茶', icon: '/static/images/menu/alittle.png' },
+	{ id: 9, name: '点牛乳', icon: '/static/images/menu/alittle.png' },
 	
   ])
 }

@@ -1,7 +1,7 @@
 <template>
-	<view class="menu-list">
+	<view class="menu-list" :style="{ paddingTop: safeAreaInsets.top + 'px' }">
 		<!-- 顶部搜索 -->
-		<view class="selectMenu" :style="{ paddingTop: safeAreaInsets.top + 'px' }">
+		<view class="selectMenu"  >
 			<view class="backToHome" @click="backToHome">
 				<uni-icons type="home" size="30"></uni-icons>
 			</view>
@@ -11,56 +11,59 @@
 				<input class="search-input" placeholder="搜索" disabled />
 			</view>
 		</view>
-		<!-- 门店信息 -->
-		<view class="store-bar">
-			<view class="left">
-				<!-- <uni-icons type="home" size="22" @click="backToHome" /> -->
-				<text class="store-name">苏州体育中心店</text>
-				<uni-icons type="arrowdown" size="16" class="arrow" />
-				<text class="distance">距离您1km</text>
-			</view>
-			<view class="right">
-				<view class="btn self">自取</view>
-				<view class="btn delivery">外卖</view>
-			</view>
-		</view>
-
-		<view class="content">
-			<!-- 纵向菜单分类 -->
-			<scroll-view scroll-y="true" class="category-bar">
-				<view v-for="cat in categories" :key="cat.id"
-					:class="['cat-item', cat.id === activeCategory ? 'active' : '']" @click="selectCategory(cat.id)">
-					<image v-if="cat.icon && cat.icon !== 'NEW'" :src="cat.icon" class="cat-icon" />
-					<text v-else-if="cat.icon === 'NEW'" class="cat-new">NEW</text>
-					<text class="cat-name">{{ cat.name }}</text>
+		<view class="main-content" :style="{ marginTop: 60+'px' }">
+			<!-- 门店信息 -->
+			<view class="store-bar">
+				<view class="left">
+					<!-- <uni-icons type="home" size="22" @click="backToHome" /> -->
+					<text class="store-name">苏州体育中心店</text>
+					<uni-icons type="arrowdown" size="16" class="arrow" />
+					<text class="distance">距离您1km</text>
 				</view>
-			</scroll-view>
+				<view class="right">
+					<view class="btn self">自取</view>
+					<view class="btn delivery">外卖</view>
+				</view>
+			</view>
 
-			<view class="menuContent">
-				<!-- banner -->
-				<!-- <swiper class="banner-swiper" circular autoplay interval="3000">
+			<view class="content">
+				<!-- 纵向菜单分类 -->
+				<scroll-view scroll-y="true" class="category-bar">
+					<view v-for="cat in categories" :key="cat.id"
+						:class="['cat-item', cat.id === activeCategory ? 'active' : '']"
+						@click="selectCategory(cat.id)">
+						<image v-if="cat.icon && cat.icon !== 'NEW'" :src="cat.icon" class="cat-icon" />
+						<text v-else-if="cat.icon === 'NEW'" class="cat-new">NEW</text>
+						<text class="cat-name">{{ cat.name }}</text>
+					</view>
+				</scroll-view>
+
+				<view class="menuContent">
+					<!-- banner -->
+					<!-- <swiper class="banner-swiper" circular autoplay interval="3000">
 					<swiper-item v-for="b in banners" :key="b.id">
 						<image :src="b.imageUrl" class="banner-img" mode="aspectFit" />
 					</swiper-item>
 				</swiper> -->
-				<view class="banner-swiper">
-					<swiper-banner :banner-list="banners" />
-				</view>
+					<view class="banner-swiper">
+						<swiper-banner :banner-list="banners" />
+					</view>
 
 
-				<!-- 商品列表 -->
-				<view class="product-list">
-					<view v-for="prod in filteredProducts" :key="prod.id" class="product-item">
-						<image :src="prod.imageUrl" class="prod-img" mode="aspectFill" />
-						<view class="prod-info">
-							<view class="prod-title">
-								<text class="prod-name">{{ prod.name }}</text>
-								<text v-if="prod.isNew" class="prod-new">NEW</text>
-							</view>
-							<!-- <text class="prod-desc">{{ prod.desc }}</text> -->
-							<view class="prod-bottom">
-								<text class="prod-price">￥{{ prod.price.toFixed(2) }}</text>
-								<button class="add-btn" size="mini">+</button>
+					<!-- 商品列表 -->
+					<view class="product-list">
+						<view v-for="prod in filteredProducts" :key="prod.id" class="product-item">
+							<image :src="prod.imageUrl" class="prod-img" mode="aspectFill" />
+							<view class="prod-info">
+								<view class="prod-title">
+									<text class="prod-name">{{ prod.name }}</text>
+									<text v-if="prod.isNew" class="prod-new">NEW</text>
+								</view>
+								<!-- <text class="prod-desc">{{ prod.desc }}</text> -->
+								<view class="prod-bottom">
+									<text class="prod-price">￥{{ prod.price.toFixed(2) }}</text>
+									<button class="add-btn" size="mini">+</button>
+								</view>
 							</view>
 						</view>
 					</view>
@@ -102,7 +105,7 @@ onMounted(async () => {
 </script>
 <style lang="scss" scoped>
 .menu-list {
-	background: #f7f7f7;
+	background: white;
 	height: 100vh;
 	display: flex;
 	flex-direction: column;
@@ -122,8 +125,8 @@ onMounted(async () => {
 		.backToHome {
 			position: absolute;
 			left: 15rpx;
-			// top: 50%;
-			// transform: translateY(-50%);
+			top: 50%;
+			transform: translateY(-50%);
 		}
 
 		.search-bar {
@@ -135,8 +138,8 @@ onMounted(async () => {
 			border-radius: 16px;
 			padding: 6px 12px;
 			left: 50%;
-			// top: 50%;
-			transform: translateX(-50%);
+			top: 50%;
+			transform: translate(-50%,-50%);
 
 			.search-input {
 				border: none;
@@ -150,11 +153,13 @@ onMounted(async () => {
 
 	.store-bar {
 		display: flex;
-		margin-top: 60px;
+		// margin-top: 115px;
 		justify-content: space-between;
 		align-items: center;
 		padding: 12px 16px 8px 16px;
 		background: #fff;
+		// border: 1px solid #f7f7f7;
+		height: 40px;
 		overflow: hidden;
 
 		.left {
@@ -291,7 +296,7 @@ onMounted(async () => {
 					box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 
 					.prod-img {
-						padding:10px 0 10px  10px;
+						padding: 10px 0 10px 10px;
 						width: 80px;
 						height: 80px;
 						object-fit: cover;
