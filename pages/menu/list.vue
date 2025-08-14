@@ -1,7 +1,7 @@
 <template>
 	<view class="menu-list" :style="{ paddingTop: safeAreaInsets.top + 'px' }">
 		<!-- 顶部搜索 -->
-		<view class="selectMenu"  >
+		<view class="selectMenu">
 			<view class="backToHome" @click="backToHome">
 				<uni-icons type="home" size="30"></uni-icons>
 			</view>
@@ -11,11 +11,10 @@
 				<input class="search-input" placeholder="搜索" disabled />
 			</view>
 		</view>
-		<view class="main-content" :style="{ marginTop: 60+'px' }">
+		<view class="main-content" :style="{ marginTop: 60 + 'px' }">
 			<!-- 门店信息 -->
 			<view class="store-bar">
 				<view class="left">
-					<!-- <uni-icons type="home" size="22" @click="backToHome" /> -->
 					<text class="store-name">苏州体育中心店</text>
 					<uni-icons type="arrowdown" size="16" class="arrow" />
 					<text class="distance">距离您1km</text>
@@ -28,7 +27,7 @@
 
 			<view class="content">
 				<!-- 纵向菜单分类 -->
-				<scroll-view scroll-y="true" class="category-bar">
+				<view class="category-bar">
 					<view v-for="cat in categories" :key="cat.id"
 						:class="['cat-item', cat.id === activeCategory ? 'active' : '']"
 						@click="selectCategory(cat.id)">
@@ -36,45 +35,49 @@
 						<text v-else-if="cat.icon === 'NEW'" class="cat-new">NEW</text>
 						<text class="cat-name">{{ cat.name }}</text>
 					</view>
-				</scroll-view>
+				</view>
 
 				<view class="menuContent">
-					<!-- banner -->
-					<!-- <swiper class="banner-swiper" circular autoplay interval="3000">
-					<swiper-item v-for="b in banners" :key="b.id">
-						<image :src="b.imageUrl" class="banner-img" mode="aspectFit" />
-					</swiper-item>
-				</swiper> -->
-					<view class="banner-swiper">
-						<swiper-banner :banner-list="banners" />
-					</view>
+					<scroll-view scroll-y="true" class="content-scroll" @scroll="onProductScroll"
+						:scroll-into-view="scrollIntoView" :scroll-with-animation="true">
+						<!-- banner -->
+						<view class="banner-swiper">
+							<swiper-banner :banner-list="banners" />
+						</view>
 
-
-					<!-- 商品列表 -->
-					<view class="product-list">
-						<view v-for="prod in filteredProducts" :key="prod.id" class="product-item">
-							<image :src="prod.imageUrl" class="prod-img" mode="aspectFill" />
-							<view class="prod-info">
-								<view class="prod-title">
-									<text class="prod-name">{{ prod.name }}</text>
-									<text v-if="prod.isNew" class="prod-new">NEW</text>
+						<!-- 商品列表 -->
+						<view class="product-list">
+							<view v-for="categoryGroup in groupedProducts" :key="categoryGroup.categoryId"
+								:class="['category-section', `category-${categoryGroup.categoryId}`]"
+								:id="`category-${categoryGroup.categoryId}`">
+								<!-- 分类标题 -->
+								<view class="category-title">
+									<text class="category-name">{{ categoryGroup.categoryName }}</text>
 								</view>
-								<!-- <text class="prod-desc">{{ prod.desc }}</text> -->
-								<view class="prod-bottom">
-									<text class="prod-price">￥{{ prod.price.toFixed(2) }}</text>
-									<button class="add-btn" size="mini">+</button>
+								<!-- 该分类下的商品 -->
+								<view v-for="prod in categoryGroup.products" :key="prod.id" class="product-item">
+									<image :src="prod.imageUrl" class="prod-img" mode="aspectFill" />
+									<view class="prod-info">
+										<view class="prod-title">
+											<text class="prod-name">{{ prod.name }}</text>
+											<text v-if="prod.isNew" class="prod-new">NEW</text>
+										</view>
+										<view class="prod-bottom">
+											<text class="prod-price">￥{{ prod.price.toFixed(2) }}</text>
+											<button class="add-btn" size="mini">+</button>
+										</view>
+									</view>
 								</view>
 							</view>
 						</view>
-					</view>
+					</scroll-view>
 				</view>
 			</view>
 		</view>
-
 	</view>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import type { Ref } from 'vue'
 import { getMenuCategories, getMenuProducts } from '@/utils/api/menu-mock'
 import { getMockBanners } from '@/utils/api/mock'
@@ -85,14 +88,74 @@ const categories: Ref<any[]> = ref([])
 const products: Ref<any[]> = ref([])
 const banners: Ref<any[]> = ref([])
 const activeCategory = ref(1)
+const scrollIntoView = ref('')
 
-const filteredProducts = computed(() => {
-	return products.value.filter((p: any) => p.categoryId === activeCategory.value)
+// 按分类分组的商品
+const groupedProducts = computed(() => {
+	const groups: any[] = []
+
+	categories.value.forEach((cat: any) => {
+		const categoryProducts = products.value.filter((p: any) => p.categoryId === cat.id)
+		if (categoryProducts.length > 0) {
+			groups.push({
+				categoryId: cat.id,
+				categoryName: cat.name,
+				products: categoryProducts
+			})
+		}
+	})
+
+	return groups
 })
 
+// 选择分类时滚动到对应位置
 function selectCategory(id: number) {
 	activeCategory.value = id
+
+	// 使用nextTick确保DOM更新后再滚动
+	nextTick(() => {
+		// 设置滚动目标
+		scrollIntoView.value = `category-${id}`
+
+		// 延迟一下确保滚动生效
+		setTimeout(() => {
+			scrollIntoView.value = ''
+		}, 100)
+	})
 }
+
+// 商品列表滚动时更新当前激活的分类
+function onProductScroll(e: any) {
+	const scrollTop = e.detail.scrollTop
+
+	// 获取所有分类区域的位置信息
+	const categorySections = groupedProducts.value
+	let currentCategory = 1
+
+	// 遍历所有分类区域，找到当前在可视区域内的分类
+	categorySections.forEach((section: any) => {
+		const sectionId = `category-${section.categoryId}`
+		const query = uni.createSelectorQuery()
+
+		query.select(`#${sectionId}`).boundingClientRect((rect: any) => {
+			if (rect) {
+				// 判断分类区域是否在可视区域内
+				// 只要分类区域的一部分在可视区域内，就认为它是当前分类
+				const isVisible = rect.top < 200 && rect.bottom > 0
+
+				if (isVisible) {
+					currentCategory = section.categoryId
+				}
+			}
+		}).exec()
+	})
+
+	// 更新激活的分类
+	if (currentCategory !== activeCategory.value) {
+		activeCategory.value = currentCategory
+	}
+}
+
 function backToHome() {
 	uni.switchTab({ url: '/pages/index/index' })
 }
@@ -114,13 +177,9 @@ onMounted(async () => {
 	.selectMenu {
 		position: fixed;
 		width: 100%;
-		// top: 0;
-		// left: 0;
-		// right: 0;
 		z-index: 100;
 		height: 50px;
 		background-color: white;
-		// position: relative;
 
 		.backToHome {
 			position: absolute;
@@ -139,7 +198,7 @@ onMounted(async () => {
 			padding: 6px 12px;
 			left: 50%;
 			top: 50%;
-			transform: translate(-50%,-50%);
+			transform: translate(-50%, -50%);
 
 			.search-input {
 				border: none;
@@ -153,12 +212,10 @@ onMounted(async () => {
 
 	.store-bar {
 		display: flex;
-		// margin-top: 115px;
 		justify-content: space-between;
 		align-items: center;
 		padding: 12px 16px 8px 16px;
 		background: #fff;
-		// border: 1px solid #f7f7f7;
 		height: 40px;
 		overflow: hidden;
 
@@ -203,19 +260,17 @@ onMounted(async () => {
 
 	.content {
 		display: flex;
+		height: calc(100vh - 110px);
+		background-color: white;
 
 		.category-bar {
-			left: 0;
 			width: 20%;
-			height: 85vh;
-			margin: 12px 0 0 0;
-			padding: 0 5px;
-			white-space: wrap;
-			overflow-y: auto;
+			height: 100%;
+			padding: 12px 0 0 0;
 			background: #f2f2f2;
 			text-align: center;
-			align-items: center;
-			justify-content: center;
+			overflow-y: auto;
+			position: relative;
 
 			&::-webkit-scrollbar {
 				width: 2px;
@@ -223,7 +278,7 @@ onMounted(async () => {
 			}
 
 			&::-webkit-scrollbar-thumb {
-				background: #e6b800;
+				// background: #e6b800;
 				border-radius: 8px;
 			}
 
@@ -232,15 +287,22 @@ onMounted(async () => {
 			}
 
 			.cat-item {
-				display: inline-flex;
+				display: flex;
 				flex-direction: column;
 				align-items: center;
-				margin: 8px 4px;
+				justify-content: center;
+				margin: 0;
+				padding: 12px 8px;
+				cursor: pointer;
+				position: relative;
+				width: 100%;
+				box-sizing: border-box;
+				transition: all 0.3s ease;
 
 				.cat-icon {
 					width: 45px;
 					height: 45px;
-					margin-bottom: 2px;
+					margin-bottom: 8px;
 				}
 
 				.cat-new {
@@ -248,34 +310,65 @@ onMounted(async () => {
 					background: #e6b800;
 					border-radius: 8px;
 					font-size: 10px;
-					padding: 0 4px;
-					margin-bottom: 2px;
+					padding: 2px 6px;
+					margin-bottom: 8px;
 				}
 
 				.cat-name {
 					font-size: 13px;
 					color: #333;
+					line-height: 1.2;
 				}
 
-				&.active .cat-name {
-					color: #1aad19;
-					font-weight: bold;
+				&.active {
+					background-color: #fff;
+					box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+					// border-radius: 0 20px 20px 0;
+					margin-right: -8px;
+					position: relative;
+					z-index: 10;
+
+					&::before {
+						content: '';
+						position: absolute;
+						left: 0;
+						top: 0;
+						width: 5px;
+						height: 100%;
+						background: $uni-text-color-green;
+						border-radius: 0 2px 2px 0;
+					}
+
+					.cat-name {
+						color: $uni-text-color-green;
+						font-weight: bold;
+					}
+				}
+
+				&:hover:not(.active) {
+					background-color: rgba(255, 255, 255, 0.3);
 				}
 			}
 		}
 
 		.menuContent {
+			flex: 1;
 			display: flex;
 			flex-direction: column;
-			flex: 1;
-			white-space: wrap;
+			height: 100%;
+			overflow: hidden;
+
+			.content-scroll {
+				flex: 1;
+				height: 0;
+			}
 
 			.banner-swiper {
 				width: 70vw;
-				// height: 130px;
 				margin: 14px auto 0 auto;
 				border-radius: 12px;
 				overflow: hidden;
+				flex-shrink: 0;
 
 				.banner-img {
 					width: 100%;
@@ -286,6 +379,24 @@ onMounted(async () => {
 
 			.product-list {
 				margin: 18px 12px 0 12px;
+
+				.category-section {
+					margin-bottom: 20px;
+
+					.category-title {
+						background: #f8f8f8;
+						padding: 12px 16px;
+						margin-bottom: 12px;
+						border-radius: 8px;
+						border-left: 4px solid $uni-text-color-green;
+
+						.category-name {
+							font-size: 16px;
+							font-weight: bold;
+							color: #333;
+						}
+					}
+				}
 
 				.product-item {
 					display: flex;
@@ -329,12 +440,6 @@ onMounted(async () => {
 							}
 						}
 
-						.prod-desc {
-							color: #888;
-							font-size: 13px;
-							margin: 4px 0 8px 0;
-						}
-
 						.prod-bottom {
 							display: flex;
 							align-items: center;
@@ -363,8 +468,6 @@ onMounted(async () => {
 				}
 			}
 		}
-
 	}
-
 }
 </style>
