@@ -54,7 +54,7 @@ export const getOrderHistory = (): Promise<OrderHistory[]> => {
     },
     {
       id: 2,
-      storeAddress: "苏州创业园店",
+      storeAddress: "苏州狮山龙湖店",
       orderTime: "2025-07-16 13:34:00",
       status: "已完成",
       type: "自取",

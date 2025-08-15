@@ -83,12 +83,16 @@ import { getMenuCategories, getMenuProducts } from '@/utils/api/menu-mock'
 import { getMockBanners } from '@/utils/api/mock'
 import SwiperBanner from '@/components/swiper-banner/index.vue'
 
+// 声明uni全局变量
+declare const uni: any
+
 const safeAreaInsets = (uni.getSystemInfoSync && uni.getSystemInfoSync().safeAreaInsets) || { top: 0 }
 const categories: Ref<any[]> = ref([])
 const products: Ref<any[]> = ref([])
 const banners: Ref<any[]> = ref([])
 const activeCategory = ref(1)
-const scrollIntoView = ref('')
+const scrollTimer = ref<any>(null)
+const scrollIntoView = ref<string>('')
 
 // 按分类分组的商品
 const groupedProducts = computed(() => {
@@ -111,16 +115,15 @@ const groupedProducts = computed(() => {
 // 选择分类时滚动到对应位置
 function selectCategory(id: number) {
 	activeCategory.value = id
-
 	// 使用nextTick确保DOM更新后再滚动
 	nextTick(() => {
-		// 设置滚动目标
-		scrollIntoView.value = `category-${id}`
-
-		// 延迟一下确保滚动生效
+		// 在微信小程序中，使用scroll-into-view来控制scroll-view的滚动
+		const targetId = `category-${id}`
+		scrollIntoView.value = targetId
+		// 延迟清除，确保滚动生效
 		setTimeout(() => {
 			scrollIntoView.value = ''
-		}, 100)
+		}, 500)
 	})
 }
 
@@ -128,32 +131,41 @@ function selectCategory(id: number) {
 function onProductScroll(e: any) {
 	const scrollTop = e.detail.scrollTop
 
-	// 获取所有分类区域的位置信息
-	const categorySections = groupedProducts.value
-	let currentCategory = 1
-
-	// 遍历所有分类区域，找到当前在可视区域内的分类
-	categorySections.forEach((section: any) => {
-		const sectionId = `category-${section.categoryId}`
-		const query = uni.createSelectorQuery()
-
-		query.select(`#${sectionId}`).boundingClientRect((rect: any) => {
-			if (rect) {
-				// 判断分类区域是否在可视区域内
-				// 只要分类区域的一部分在可视区域内，就认为它是当前分类
-				const isVisible = rect.top < 200 && rect.bottom > 0
-
-				if (isVisible) {
-					currentCategory = section.categoryId
-				}
-			}
-		}).exec()
-	})
-
-	// 更新激活的分类
-	if (currentCategory !== activeCategory.value) {
-		activeCategory.value = currentCategory
+	// 使用节流来优化性能
+	if (scrollTimer.value) {
+		clearTimeout(scrollTimer.value)
 	}
+
+	scrollTimer.value = setTimeout(() => {
+		// 使用更简单的方法：基于滚动位置计算当前分类
+		const categorySections = groupedProducts.value
+		let currentCategory = 1
+
+		// 计算每个分类的大概位置（基于商品数量）
+		let accumulatedHeight = 0
+		const bannerHeight = 200 // banner大概高度
+		const categoryTitleHeight = 60 // 分类标题高度
+		const productItemHeight = 120 // 每个商品项高度
+
+		accumulatedHeight += bannerHeight
+
+		for (let i = 0; i < categorySections.length; i++) {
+			const section = categorySections[i]
+			const sectionHeight = categoryTitleHeight + (section.products.length * productItemHeight)
+
+			if (scrollTop >= accumulatedHeight && scrollTop < accumulatedHeight + sectionHeight) {
+				currentCategory = section.categoryId
+				break
+			}
+
+			accumulatedHeight += sectionHeight
+		}
+
+		// 更新激活的分类
+		if (currentCategory !== activeCategory.value) {
+			activeCategory.value = currentCategory
+		}
+	}, 100) // 100ms的节流延迟，减少性能消耗
 }
 
 function backToHome() {
@@ -164,6 +176,13 @@ onMounted(async () => {
 	categories.value = await getMenuCategories()
 	products.value = await getMenuProducts()
 	banners.value = await getMockBanners()
+
+	// 清理定时器
+	return () => {
+		if (scrollTimer.value) {
+			clearTimeout(scrollTimer.value)
+		}
+	}
 })
 </script>
 <style lang="scss" scoped>
