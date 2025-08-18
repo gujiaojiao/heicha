@@ -8,108 +8,155 @@
 			</view>
 		</view>
 
-		<!-- 滚动内容区域 -->
-		<view class="scrollable-area">
+		<!-- 加载状态 -->
+		<view v-if="loading" class="loading">
+			<text>加载中...</text>
+		</view>
+
+		<!-- 订单详情内容 -->
+		<view v-else-if="orderDetail" class="scrollable-area">
 			<!-- 取餐号和状态 -->
 			<view class="order-status-section">
 				<view class="pickup-number">
 					<text class="label">取餐号</text>
-					<text class="number">B500</text>
+					<text class="number">{{ orderDetail.pickupNumber }}</text>
 					<view class="status">
 						<text class="dots">•••</text>
-						<text class="status-text">订单已完成</text>
+						<text class="status-text">{{ orderDetail.status }}</text>
 						<text class="dots">•••</text>
 					</view>
 				</view>
 			</view>
 
-			<!-- 促销横幅 -->
-			<!-- <view class="promo-banner">
-				<view class="promo-content">
-					<view class="promo-text">
-						<text class="main-text">加入点门社群</text>
-						<text class="sub-text">首次入群享领</text>
-					</view>
-					<view class="promo-offer">
-						<text class="offer-tag">超值券包</text>
-						<text class="offer-amount">30</text>
-						<text class="offer-currency">元</text>
-					</view>
-				</view>
-				<view class="promo-characters">
-					<view class="character char1">☁️</view>
-					<view class="character char2">❤️</view>
-					<view class="character char3">🌿</view>
-				</view>
-			</view> -->
+
 
 			<!-- 订单详情卡片 -->
 			<view class="order-details">
 				<view class="detail-card">
-					<text class="detail-label">取餐时间</text>
-					<text class="detail-value">立即取餐</text>
-				</view>
-				<view class="detail-card">
 					<text class="detail-label">享用方式</text>
-					<text class="detail-value">自取</text>
+					<text class="detail-value">{{ orderDetail.type }}</text>
+				</view>
+				<view class="detail-card" v-if="orderDetail.remark">
+					<text class="detail-label">备注</text>
+					<text class="detail-value">{{ orderDetail.remark }}</text>
 				</view>
 			</view>
 
 			<!-- 门店信息 -->
 			<view class="store-info-card">
 				<view class="store-header">
-					<text class="store-name">苏州创业园店</text>
+					<text class="store-name">{{ orderDetail.storeAddress }}</text>
 					<uni-icons type="right" size="16" color="#999"></uni-icons>
 				</view>
 				<view class="store-address">
 					<uni-icons type="location" size="16" color="#999"></uni-icons>
-					<text class="address-text">江苏省苏州市虎丘区高新区...</text>
+					<text class="address-text">{{ orderDetail.storeAddressDetail }}</text>
 				</view>
-				<view class="store-contact">
+				<view class="store-contact" @click="callStore">
 					<uni-icons type="phone" size="20" color="#1aad19"></uni-icons>
 				</view>
 			</view>
 
 			<!-- 商品详情 -->
 			<view class="product-card">
-				<view class="product-info">
-					<image src="/static/images/menu/alittle.png" class="product-image" mode="aspectFill"></image>
+				<view v-for="(product, index) in orderDetail.products" :key="index" class="product-info">
+					<image :src="product.imageUrl" class="product-image" mode="aspectFill"></image>
 					<view class="product-details">
-						<text class="product-name">四季奶青</text>
+						<text class="product-name">{{ product.name }}</text>
 						<view class="product-options">
-							<text class="option">中杯</text>
-							<text class="option">去冰</text>
-							<text class="option">不另外加糖</text>
-							<text class="option">波霸</text>
-							<text class="option">椰果</text>
-						</view>
-						<view class="promo-tags">
-							<text class="promo-tag">【超值】经典招牌8选1</text>
-							<text class="discount">- ¥12</text>
+							<text class="option">{{ product.desc }}</text>
 						</view>
 					</view>
 					<view class="product-price">
-						<text class="price">¥12.00</text>
-						<text class="quantity">x1</text>
+						<text class="price">¥{{ product.price.toFixed(2) }}</text>
+						<text class="quantity">x{{ product.count }}</text>
 					</view>
+				</view>
+
+				<!-- 订单总价 -->
+				<view class="order-total">
+					<text class="total-label">订单总计</text>
+					<text class="total-price">¥{{ orderDetail.totalPrice.toFixed(2) }}</text>
+				</view>
+			</view>
+
+			<!-- 订单基本信息 -->
+			<view class="order-info-card">
+				<view class="info-item">
+					<text class="label">订单编号</text>
+					<text class="value">{{ orderDetail.orderNumber }}</text>
+				</view>
+				<view class="info-item">
+					<text class="label">下单时间</text>
+					<text class="value">{{ orderDetail.orderTime }}</text>
+				</view>
+				<view class="info-item">
+					<text class="label">支付方式</text>
+					<text class="value">{{ orderDetail.paymentMethod }}</text>
+				</view>
+				<view class="info-item">
+					<text class="label">支付时间</text>
+					<text class="value">{{ orderDetail.paymentTime }}</text>
+				</view>
+				<view class="info-item">
+					<text class="label">取餐时间</text>
+					<text class="value">{{ orderDetail.pickupTime }}</text>
 				</view>
 			</view>
 		</view>
 
 		<!-- 底部固定按钮 -->
 		<view class="bottom-fixed">
-			<button class="reorder-btn" @click="reorder">再来一单</button>
+			<button class="reorder-btn" @click="reorder">{{ orderDetail?.buttonText || '再来一单' }}</button>
 		</view>
 	</view>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+// @ts-ignore
+import { ref, onMounted } from 'vue'
+import { getOrderDetail, type OrderDetail } from '@/utils/api/order-mock'
 
 // 声明uni全局变量
 declare const uni: any
+// 声明 getCurrentPages 函数
+declare function getCurrentPages(): any[]
 
 const safeAreaInsets = (uni.getSystemInfoSync && uni.getSystemInfoSync().safeAreaInsets) || { top: 0 }
+
+// 订单详情数据
+const orderDetail = ref<OrderDetail | null>(null)
+const loading = ref(true)
+
+// 获取页面参数中的订单ID
+const getOrderId = (): number => {
+	const pages = getCurrentPages()
+	const currentPage = pages[pages.length - 1]
+	const options = currentPage.options || {}
+	return parseInt(options.id) || 1
+}
+
+// 获取订单详情
+const fetchOrderDetail = async () => {
+	try {
+		const orderId = getOrderId()
+		const detail = await getOrderDetail(orderId)
+		orderDetail.value = detail
+	} catch (error) {
+		console.error('获取订单详情失败:', error)
+		uni.showToast({
+			title: '获取订单详情失败',
+			icon: 'error'
+		})
+	} finally {
+		loading.value = false
+	}
+}
+
+// 页面加载时获取数据
+onMounted(() => {
+	fetchOrderDetail()
+})
 
 const back = () => {
 	uni.navigateBack({ delta: 1 })
@@ -117,17 +164,27 @@ const back = () => {
 
 const reorder = () => {
 	// 再来一单的逻辑
-	// uni.showToast({
-	// 	title: '正在跳转到点餐页面...',
-	// 	icon: 'loading',
-	// 	duration: 500
-	// })
-
 	setTimeout(() => {
 		uni.switchTab({
 			url: '/pages/menu/list'
 		})
 	}, 200)
+}
+
+// 拨打电话给门店
+const callStore = () => {
+	if (orderDetail.value?.storePhone) {
+		uni.makePhoneCall({
+			phoneNumber: orderDetail.value.storePhone,
+			fail: (err: any) => {
+				console.error('拨打电话失败:', err)
+				uni.showToast({
+					title: '拨打电话失败',
+					icon: 'error'
+				})
+			}
+		})
+	}
 }
 </script>
 
@@ -170,6 +227,16 @@ const reorder = () => {
 				align-items: center;
 			}
 		}
+	}
+
+	// 加载状态
+	.loading {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 200px;
+		color: #999;
+		font-size: 14px;
 	}
 
 	.scrollable-area {
@@ -224,68 +291,7 @@ const reorder = () => {
 			}
 		}
 
-		// // 促销横幅
-		// .promo-banner {
-		// 	background: linear-gradient(135deg, #1aad19, #2ecc71);
-		// 	border-radius: 12px;
-		// 	padding: 20px;
-		// 	margin-bottom: 15px;
-		// 	display: flex;
-		// 	justify-content: space-between;
-		// 	align-items: center;
-		// 	color: white;
 
-		// 	.promo-content {
-		// 		flex: 1;
-
-		// 		.main-text {
-		// 			display: block;
-		// 			font-size: 18px;
-		// 			font-weight: bold;
-		// 			margin-bottom: 5px;
-		// 		}
-
-		// 		.sub-text {
-		// 			display: block;
-		// 			font-size: 14px;
-		// 			opacity: 0.9;
-		// 			margin-bottom: 10px;
-		// 		}
-
-		// 		.promo-offer {
-		// 			display: flex;
-		// 			align-items: baseline;
-
-		// 			.offer-tag {
-		// 				background: rgba(255, 255, 255, 0.2);
-		// 				padding: 2px 8px;
-		// 				border-radius: 12px;
-		// 				font-size: 12px;
-		// 				margin-right: 8px;
-		// 			}
-
-		// 			.offer-amount {
-		// 				font-size: 24px;
-		// 				font-weight: bold;
-		// 				margin-right: 4px;
-		// 			}
-
-		// 			.offer-currency {
-		// 				font-size: 16px;
-		// 			}
-		// 		}
-		// 	}
-
-		// 	.promo-characters {
-		// 		display: flex;
-		// 		gap: 8px;
-
-		// 		.character {
-		// 			font-size: 24px;
-		// 			opacity: 0.8;
-		// 		}
-		// 	}
-		// }
 
 		// 订单详情卡片
 		.order-details {
@@ -358,10 +364,15 @@ const reorder = () => {
 			background: white;
 			border-radius: 12px;
 			padding: 20px;
-			margin-bottom: 80px; // 为底部按钮留出空间
+			margin-bottom: 15px; // 为底部按钮留出空间
 
 			.product-info {
 				display: flex;
+				margin-bottom: 20px;
+
+				&:last-of-type {
+					margin-bottom: 0;
+				}
 
 				.product-image {
 					width: 80px;
@@ -397,23 +408,6 @@ const reorder = () => {
 							font-size: 12px;
 						}
 					}
-
-					.promo-tags {
-						display: flex;
-						align-items: center;
-						gap: 8px;
-
-						.promo-tag {
-							color: #e74c3c;
-							font-size: 12px;
-						}
-
-						.discount {
-							color: #e74c3c;
-							font-size: 14px;
-							font-weight: bold;
-						}
-					}
 				}
 
 				.product-price {
@@ -434,6 +428,60 @@ const reorder = () => {
 					}
 				}
 			}
+
+			// 订单总计
+			.order-total {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding-top: 15px;
+				border-top: 1px solid #eee;
+				margin-top: 15px;
+
+				.total-label {
+					color: #333;
+					font-size: 16px;
+					font-weight: bold;
+				}
+
+				.total-price {
+					color: #e74c3c;
+					font-size: 18px;
+					font-weight: bold;
+				}
+			}
+		}
+
+		// 订单基本信息卡片
+		.order-info-card {
+			background: white;
+			border-radius: 12px;
+			padding: 20px;
+			margin-bottom: 80px;
+
+			.info-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 12px;
+
+				&:last-child {
+					margin-bottom: 0;
+				}
+
+				.label {
+					color: #666;
+					font-size: 14px;
+				}
+
+				.value {
+					color: #333;
+					font-size: 14px;
+					font-weight: 500;
+					max-width: 60%;
+					text-align: right;
+				}
+			}
 		}
 	}
 
@@ -451,7 +499,7 @@ const reorder = () => {
 		.reorder-btn {
 			width: 100%;
 			height: 50px;
-			background:$alittle-color ;
+			background: $alittle-color ;
 			color: white;
 			border: none;
 			border-radius: 25px;

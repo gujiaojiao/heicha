@@ -15,12 +15,14 @@
 		<view class="content-area" :style="{ paddingTop: safeAreaInsets.top + 80 + 'px' }">
 			<!-- 当前订单 -->
 			<view class="currentOrder" v-if="activeTab === 0">
-				lalalal
+				<view class="noCurrentOrder">
+					当前尚未有进行中的订单，快去点一杯ba~
+				</view>
 			</view>
 			<!-- 历史订单 -->
 			<view class="historyOrder" v-if="activeTab === 1">
 				<view v-for="item in historyOrder" :key="item.id">
-					<view class="historyOrder__item" @click="handleToDetail">
+					<view class="historyOrder__item" @click="handleToDetail(item.id)">
 						<view class="historyOrderItemcontent">
 							<view class="historyOrderItem">
 								<view class="addressName">{{ item.storeAddress }}</view>
@@ -85,8 +87,8 @@ const switchTab = (tabIndex: number) => {
 	loadData()
 }
 
-const handleToDetail=()=>{
-	const url='/pages/order/historyOrderDetail'
+const handleToDetail=(id:any)=>{
+	const url='/pages/order/historyOrderDetail?id='+id
 	uni.navigateTo({
 		url,
 		fail: (err) => {
@@ -192,6 +194,18 @@ onMounted(() => {
 
 		.currentOrder {
 			padding: 15px 10px;
+			
+			.noCurrentOrder{
+				width: 100%;
+				height: 50px;
+				background-color: #1aad19;
+				// display: flex;
+				position: relative;
+				left:50%;
+				top:50%;
+				transform: translate(-50%,-50%);
+				text-align: center;
+			}
 		}
 
 		.historyOrder {

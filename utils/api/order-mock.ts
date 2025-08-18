@@ -126,3 +126,67 @@ export const getCurrentOrder = (): Promise<CurrentOrder> => {
     status: "制作中"      // 也可以是“待取餐”、“已完成”
   })
 }
+
+// 订单详情类型（扩展历史订单信息）
+export interface OrderDetail extends OrderHistory {
+  orderNumber: string;      // 订单编号
+  paymentMethod: string;    // 支付方式
+  paymentTime: string;      // 支付时间
+  pickupTime: string;       // 取餐时间
+  pickupNumber: string;     // 取餐号
+  storePhone: string;       // 门店电话
+  storeAddressDetail: string; // 详细地址
+  remark: string;           // 备注信息
+}
+
+// 获取单个订单详情
+export const getOrderDetail = (id: number): Promise<OrderDetail> => {
+  // 基于历史订单数据创建详情数据
+  const orderHistory = getOrderHistory();
+  
+  return orderHistory.then(orders => {
+    const order = orders.find(o => o.id === id);
+    if (!order) {
+      throw new Error('订单不存在');
+    }
+    
+    // 根据订单ID返回对应的详情数据
+    const orderDetails: { [key: number]: OrderDetail } = {
+      1: {
+        ...order,
+        orderNumber: "DD20250723121812001",
+        paymentMethod: "微信支付",
+        paymentTime: "2025-07-23 12:18:15",
+        pickupTime: "2025-07-23 12:25:00",
+        pickupNumber: "B500",
+        storePhone: "0512-88888888",
+        storeAddressDetail: "江苏省苏州市虎丘区高新区科技城锦峰路8号",
+        remark: "请尽快取餐"
+      },
+      2: {
+        ...order,
+        orderNumber: "DD20250716133400002",
+        paymentMethod: "支付宝",
+        paymentTime: "2025-07-16 13:34:05",
+        pickupTime: "2025-07-16 13:40:00",
+        pickupNumber: "C123",
+        storePhone: "0512-66666666",
+        storeAddressDetail: "江苏省苏州市高新区狮山路199号龙湖天街1F",
+        remark: "请到店取餐"
+      },
+      3: {
+        ...order,
+        orderNumber: "DD20250620133526003",
+        paymentMethod: "微信支付",
+        paymentTime: "2025-06-20 13:35:30",
+        pickupTime: "2025-06-20 13:42:00",
+        pickupNumber: "A456",
+        storePhone: "0512-88888888",
+        storeAddressDetail: "江苏省苏州市虎丘区高新区科技城锦峰路8号",
+        remark: "请及时取餐"
+      }
+    };
+    
+    return orderDetails[id] || orderDetails[1]; // 默认返回第一个订单详情
+  });
+}
