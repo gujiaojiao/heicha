@@ -1,8 +1,8 @@
 <template>
-    <view class="cart-preview">
+    <view class="cart-preview" v-if="count > 0">
         <!-- 购物车图标 -->
         <view class="cart-icon" @tap="onCartClick">
-            <view class="badge" v-if="count > 0">{{ count }}</view>
+            <view class="badge">{{ count }}</view>
             <image src="/static/images/icons/cart.png" mode="aspectFit" class="icon" />
         </view>
 
@@ -29,6 +29,9 @@ import { useCartStore } from '@/store/cart'
 const cartStore = useCartStore()
 const { total, count } = storeToRefs(cartStore)
 
+// 定义组件事件
+const emit = defineEmits(['open-detail'])
+
 // 点击购物车
 const onCartClick = () => {
     if (count.value === 0) {
@@ -39,9 +42,8 @@ const onCartClick = () => {
         return
     }
 
-    uni.navigateTo({
-        url: '/pages/cart/index'
-    })
+    // 触发打开详情事件
+    emit('open-detail')
 }
 
 // 去结算
@@ -57,7 +59,7 @@ const onCheckout = () => {
 <style lang="scss" scoped>
 .cart-preview {
     position: fixed;
-    bottom: 40rpx;
+    bottom: 130rpx;
     left: 40rpx;
     right: 40rpx;
     height: 100rpx;
@@ -72,7 +74,7 @@ const onCheckout = () => {
         position: relative;
         width: 80rpx;
         height: 80rpx;
-        background-color: $primary-color;
+        background-color: #007f61;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -90,7 +92,7 @@ const onCheckout = () => {
             min-width: 32rpx;
             height: 32rpx;
             padding: 0 8rpx;
-            background-color: $error-color;
+            background-color: #ff4757;
             border-radius: 16rpx;
             color: #ffffff;
             font-size: 20rpx;
@@ -98,6 +100,7 @@ const onCheckout = () => {
             align-items: center;
             justify-content: center;
         }
+
     }
 
     .price-info {
@@ -105,30 +108,30 @@ const onCheckout = () => {
         padding: 0 30rpx;
 
         .symbol {
-            font-size: $font-size-base;
-            color: $text-color-primary;
+            font-size: 28rpx;
+            color: #333;
         }
 
         .value {
             font-size: 40rpx;
-            color: $text-color-primary;
+            color: #333;
             font-weight: 500;
             margin-left: 4rpx;
         }
 
         .empty {
-            font-size: $font-size-base;
-            color: $text-color-secondary;
+            font-size: 28rpx;
+            color: #999;
         }
     }
 
     .checkout-btn {
         width: 200rpx;
         height: 80rpx;
-        background-color: $primary-color;
+        background-color: #007f61;
         border-radius: 40rpx;
         color: #ffffff;
-        font-size: $font-size-medium;
+        font-size: 28rpx;
         display: flex;
         align-items: center;
         justify-content: center;

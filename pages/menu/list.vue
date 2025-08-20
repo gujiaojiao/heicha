@@ -64,7 +64,7 @@
 										</view>
 										<view class="prod-bottom">
 											<text class="prod-price">￥{{ prod.price.toFixed(2) }}</text>
-											<button class="add-btn" size="mini">+</button>
+											<view class="add-btn" size="mini" @click="openOrderDrawer(prod)">+</view>
 										</view>
 									</view>
 								</view>
@@ -74,6 +74,16 @@
 				</view>
 			</view>
 		</view>
+
+		<!-- 点单抽屉 -->
+		<OrderDrawer :visible="orderDrawerVisible" :product-info="currentProduct" @close="closeOrderDrawer"
+			@confirm="confirmOrder" />
+
+		<!-- 购物车组件 -->
+		<CartPreview @open-detail="openCartDetail" />
+
+		<!-- 购物车详情 -->
+		<CartDetail :visible="cartDetailVisible" @close="closeCartDetail" />
 	</view>
 </template>
 <script setup lang="ts">
@@ -82,6 +92,10 @@ import type { Ref } from 'vue'
 import { getMenuCategories, getMenuProducts } from '@/utils/api/menu-mock'
 import { getMockBanners } from '@/utils/api/mock'
 import SwiperBanner from '@/components/swiper-banner/index.vue'
+import OrderDrawer from '@/components/order-drawer/index.vue'
+import CartPreview from '@/components/cart-preview/index.vue'
+import CartDetail from '@/components/cart-preview/cart-detail.vue'
+import { useCartStore } from '@/store/cart'
 
 // 声明uni全局变量
 declare const uni: any
@@ -93,6 +107,16 @@ const banners: Ref<any[]> = ref([])
 const activeCategory = ref(1)
 const scrollTimer = ref<any>(null)
 const scrollIntoView = ref<string>('')
+
+// 点单抽屉相关状态
+const orderDrawerVisible = ref(false)
+const currentProduct = ref<any>(null)
+
+// 购物车详情相关状态
+const cartDetailVisible = ref(false)
+
+// 购物车store
+const cartStore = useCartStore()
 
 // 按分类分组的商品
 const groupedProducts = computed(() => {
@@ -170,6 +194,135 @@ function onProductScroll(e: any) {
 
 function backToHome() {
 	uni.switchTab({ url: '/pages/index/index' })
+}
+
+// 打开点单抽屉
+function openOrderDrawer(product: any) {
+	currentProduct.value = {
+		id: product.id,
+		name: product.name,
+		imageUrl: product.imageUrl,
+		basePrice: product.price
+	}
+	orderDrawerVisible.value = true
+}
+
+// 关闭点单抽屉
+function closeOrderDrawer() {
+	orderDrawerVisible.value = false
+	currentProduct.value = null
+}
+
+// 打开购物车详情
+function openCartDetail() {
+	cartDetailVisible.value = true
+}
+
+// 关闭购物车详情
+function closeCartDetail() {
+	cartDetailVisible.value = false
+}
+
+// 确认点单
+function confirmOrder(orderData: any) {
+	console.log('点单确认:', orderData)
+
+	// 构建购物车商品项
+	const cartItem = {
+		id: `${orderData.productId}_${Date.now()}`, // 生成唯一ID
+		name: orderData.productName,
+		price: orderData.totalPrice,
+		image: currentProduct.value.imageUrl,
+		count: orderData.quantity,
+		attrs: [
+			`${getCupLabel(orderData.cup)}`,
+			`${getIceLabel(orderData.ice)}`,
+			`${getSugarLabel(orderData.sugar)}`,
+			...getToppingLabels(orderData.freeToppings, orderData.paidToppings)
+		]
+	}
+
+	// 添加到购物车
+	cartStore.addToCart(cartItem)
+
+	// 显示成功提示
+	uni.showToast({
+		title: '已添加到购物车',
+		icon: 'success'
+	})
+}
+
+// 辅助函数：获取杯型标签
+function getCupLabel(cup: string): string {
+	const cupMap: { [key: string]: string } = {
+		'large': '大杯',
+		'medium': '中杯'
+	}
+	return cupMap[cup] || '中杯'
+}
+
+// 辅助函数：获取冰度标签
+function getIceLabel(ice: string): string {
+	const iceMap: { [key: string]: string } = {
+		'standard': '标准冰',
+		'less': '少冰',
+		'none': '去冰',
+		'room': '常温',
+		'warm': '温',
+		'hot': '热饮'
+	}
+	return iceMap[ice] || '标准冰'
+}
+
+// 辅助函数：获取糖度标签
+function getSugarLabel(sugar: string): string {
+	const sugarMap: { [key: string]: string } = {
+		'three': '三分糖',
+		'five': '五分糖',
+		'seven': '七分糖',
+		'none': '不另外加糖',
+		'full': '全糖'
+	}
+	return sugarMap[sugar] || '七分糖'
+}
+
+// 辅助函数：获取配料标签
+function getToppingLabels(freeToppings: number[], paidToppings: number[]): string[] {
+	const labels: string[] = []
+
+	// 免费配料
+	const freeToppingMap: { [key: number]: string } = {
+		1: '小珍珠',
+		2: '波霸',
+		3: '椰果',
+		4: '仙草',
+		5: '茶冻',
+		6: '椰奶冻',
+		7: '栀子冻'
+	}
+
+	freeToppings.forEach(id => {
+		if (freeToppingMap[id]) {
+			labels.push(freeToppingMap[id])
+		}
+	})
+
+	// 加价配料
+	const paidToppingMap: { [key: number]: string } = {
+		2: '西米',
+		3: '单颗布丁',
+		4: '冰淇淋',
+		5: '奶霜',
+		6: '奶霜(分装)'
+	}
+
+	paidToppings.forEach(id => {
+		if (paidToppingMap[id]) {
+			labels.push(paidToppingMap[id])
+		}
+	})
+
+	return labels
 }
 
 onMounted(async () => {
@@ -471,16 +624,17 @@ onMounted(async () => {
 							}
 
 							.add-btn {
-								background: #1aad19;
+								background: #007f61;
 								color: #fff;
 								border-radius: 50%;
-								width: 28px;
-								height: 28px;
-								line-height: 28px;
+								width: 25px;
+								height: 25px;
+								line-height: 24px;
 								text-align: center;
-								font-size: 20px;
+								align-items: center;
+								font-size: 24px;
 								border: none;
-								padding: 0;
+								// padding: 0;
 							}
 						}
 					}

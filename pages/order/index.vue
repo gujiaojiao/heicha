@@ -16,7 +16,8 @@
 			<!-- 当前订单 -->
 			<view class="currentOrder" v-if="activeTab === 0">
 				<view class="noCurrentOrder">
-					当前尚未有进行中的订单，快去点一杯ba~
+					当前尚未有进行中的订单<br></br>
+					快去点一杯ba~
 				</view>
 			</view>
 			<!-- 历史订单 -->
