@@ -434,15 +434,17 @@ onMounted(async () => {
 		display: flex;
 		height: calc(100vh - 110px);
 		background-color: white;
+		flex-direction: row;
 
 		.category-bar {
 			width: 20%;
-			height: 100%;
+			min-height: 100%;
 			padding: 12px 0 0 0;
 			background: #f2f2f2;
 			text-align: center;
 			overflow-y: auto;
 			position: relative;
+			// padding-bottom: 90px;
 
 			&::-webkit-scrollbar {
 				width: 2px;
@@ -527,9 +529,10 @@ onMounted(async () => {
 			flex: 1;
 			display: flex;
 			flex-direction: column;
-			height: 100%;
 			overflow: hidden;
-
+			background-color: white;
+			min-height: 100vh;
+			padding-bottom: 60px;
 			.content-scroll {
 				flex: 1;
 				height: 0;

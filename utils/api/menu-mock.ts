@@ -20,13 +20,13 @@ export interface MenuProduct {
 export const getMenuCategories = (): Promise<MenuCategory[]> => {
   return Promise.resolve([
     { id: 1, name: '新品上市', icon: 'NEW' },
-    { id: 2, name: '只此系列', icon: '/static/images/menu/alittle.png' },
-    { id: 3, name: '人气推荐', icon: '/static/images/menu/alittle.png' },
-    { id: 4, name: '花果奶茶', icon: '/static/images/menu/alittle.png' },
-    { id: 5, name: '奶茶自由配', icon: '/static/images/menu/alittle.png' },
-	{ id: 6, name: '点口感', icon: '/static/images/menu/alittle.png' },
-	{ id: 7, name: '好茶自由配', icon: '/static/images/menu/alittle.png' },
-	{ id: 8, name: '点果茶', icon: '/static/images/menu/alittle.png' },
+    { id: 2, name: '只此系列', icon: '/static/images/menu/milk3.png' },
+    { id: 3, name: '人气推荐', icon: '/static/images/menu/奶茶.png' },
+    { id: 4, name: '花果奶茶', icon: '/static/images/menu/葡萄干.png' },
+    { id: 5, name: '奶茶自由配', icon: '/static/images/menu/奶茶 (1).png' },
+	{ id: 6, name: '点口感', icon: '/static/images/menu/咖啡.png' },
+	{ id: 7, name: '好茶自由配', icon: '/static/images/menu/139_茶歇区.png' },
+	{ id: 8, name: '点果茶', icon: '/static/images/menu/043-orange-juice.png' },
 	// { id: 9, name: '点牛乳', icon: '/static/images/menu/alittle.png' },
 	
   ])
@@ -135,6 +135,54 @@ export const getMenuProducts = (): Promise<MenuProduct[]> => {
 	},
 	{
 	  id: 503,
+	  categoryId: 5,
+	  name: '柠檬养乐多',
+	  desc: '多种口感可选',
+	  imageUrl: '/static/images/menu/mocha.png',
+	  price: 15.00
+	},
+	{
+	  id: 601,
+	  categoryId: 5,
+	  name: '金桔柠檬',
+	  desc: '多种口感可选',
+	  imageUrl: '/static/images/menu/mocha.png',
+	  price: 15.00
+	},
+	{
+	  id: 602,
+	  categoryId: 5,
+	  name: '金桔柠檬',
+	  desc: '多种口感可选',
+	  imageUrl: '/static/images/menu/mocha.png',
+	  price: 15.00
+	},
+	{
+	  id: 603,
+	  categoryId: 5,
+	  name: '柠檬养乐多',
+	  desc: '多种口感可选',
+	  imageUrl: '/static/images/menu/mocha.png',
+	  price: 15.00
+	},
+	{
+	  id: 601,
+	  categoryId: 5,
+	  name: '金桔柠檬',
+	  desc: '多种口感可选',
+	  imageUrl: '/static/images/menu/mocha.png',
+	  price: 15.00
+	},
+	{
+	  id: 602,
+	  categoryId: 5,
+	  name: '金桔柠檬',
+	  desc: '多种口感可选',
+	  imageUrl: '/static/images/menu/mocha.png',
+	  price: 15.00
+	},
+	{
+	  id: 603,
 	  categoryId: 5,
 	  name: '柠檬养乐多',
 	  desc: '多种口感可选',

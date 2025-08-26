@@ -225,7 +225,11 @@ const currentSpec = computed(() => {
     const cup = cupOptions.find(opt => opt.value === selectedCup.value)?.label
     const ice = iceOptions.find(opt => opt.value === selectedIce.value)?.label
     const sugar = sugarOptions.find(opt => opt.value === selectedSugar.value)?.label
-    return `${cup}/${ice}/${sugar}`
+    const freeToppingNames = selectedFreeToppings.value.map(id => freeToppings.find(t => t.id === id)?.name).filter(name => name) as string[]
+    const paidToppingNames = selectedPaidToppings.value.map(id => paidToppings.find(t => t.id === id)?.name).filter(name => name) as string[]
+    const toppingStr = freeToppingNames.length > 0 ? freeToppingNames.join('/') : ''
+    const newtoppingStr = paidToppingNames.length > 0 ? `${toppingStr}/${paidToppingNames.join('/')}` : toppingStr
+    return newtoppingStr ? `${cup}/${ice}/${sugar}/${newtoppingStr}` : `${cup}/${ice}/${sugar}`
 })
 
 // 计算总价格
