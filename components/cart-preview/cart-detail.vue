@@ -135,7 +135,7 @@ function formatAttrs(attrs) {
 function goToCheckout() {
     closeDetail()
     uni.navigateTo({
-        url: '/pages/order/index'
+        url: '/pages/menu/submit'
     })
 }
 

@@ -3,7 +3,7 @@
         <!-- 购物车图标 -->
         <view class="cart-icon" @tap="onCartClick">
             <view class="badge">{{ count }}</view>
-            <image src="/static/images/icons/cart.png" mode="aspectFit" class="icon" />
+            <image src="/static/images/logo.png" mode="aspectFit" class="icon" />
         </view>
 
         <!-- 价格信息 -->
@@ -51,7 +51,14 @@ const onCheckout = () => {
     if (total.value === 0) return
 
     uni.navigateTo({
-        url: '/pages/order/confirm'
+        url: '/pages/menu/submit',
+        fail: (err) => {
+            console.error('页面跳转失败：', err)
+            uni.showToast({
+                title: '页面跳转失败',
+                icon: 'none'
+            })
+        }
     })
 }
 </script>
@@ -59,7 +66,10 @@ const onCheckout = () => {
 <style lang="scss" scoped>
 .cart-preview {
     position: fixed;
-    bottom: 130rpx;
+	//if weixin
+    bottom: 30rpx;
+	// else if
+	bottom: 130rpx;
     left: 40rpx;
     right: 40rpx;
     height: 100rpx;

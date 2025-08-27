@@ -1,5 +1,5 @@
 <template>
-    <view class="order-drawer" :class="{ 'show': visible }">
+    <view class="order-drawer" :class="{ 'show': visible }" v-show="visible">
         <!-- 遮罩层 -->
         <view class="mask" @click="closeDrawer"></view>
 
@@ -113,7 +113,7 @@
 
             <!-- 底部确认按钮 -->
             <view class="drawer-footer">
-                <button class="confirm-btn" @click="confirmOrder">选好了</button>
+                <button class="confirm-btn" @click="confirmOrder(productInfo)">选好了</button>
             </view>
         </view>
     </view>
@@ -121,6 +121,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+declare const uni: any
 
 // 定义商品信息接口
 interface ProductInfo {
@@ -243,7 +244,7 @@ const totalPrice = computed(() => {
     }
 
     // 加价配料
-    selectedPaidToppings.value.forEach(id => {
+    selectedPaidToppings.value.forEach((id: number) => {
         const topping = paidToppings.find(t => t.id === id)
         if (topping) {
             total += topping.price
@@ -307,13 +308,16 @@ function shareProduct() {
 }
 
 function closeDrawer() {
+    console.log(111)
     emit('close')
+    console.log(111, '有被调用')
 }
 
 function confirmOrder() {
     const orderData = {
         productId: props.productInfo.id,
         productName: props.productInfo.name,
+        // imageurl:props.productInfo.imageUrl,
         cup: selectedCup.value,
         ice: selectedIce.value,
         sugar: selectedSugar.value,
@@ -325,11 +329,10 @@ function confirmOrder() {
     }
 
     emit('confirm', orderData)
-    closeDrawer()
 }
 
 // 监听visible变化，重置选择
-watch(() => props.visible, (newVal) => {
+watch(() => props.visible, (newVal: boolean) => {
     if (newVal) {
         // 重置为默认值
         selectedCup.value = 'large'
@@ -494,7 +497,7 @@ watch(() => props.visible, (newVal) => {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 10px;
-
+				padding-right: 10px;
                 .option-item {
                     position: relative;
                     padding: 8px 16px;

@@ -76,8 +76,8 @@
 		</view>
 
 		<!-- 点单抽屉 -->
-		<OrderDrawer :visible="orderDrawerVisible" :product-info="currentProduct" @close="closeOrderDrawer"
-			@confirm="confirmOrder" />
+		<OrderDrawer v-if="orderDrawerVisible" :visible="orderDrawerVisible" :product-info="currentProduct"
+			@close="closeOrderDrawer" @confirm="confirmOrder" />
 
 		<!-- 购物车组件 -->
 		<CartPreview @open-detail="openCartDetail" />
@@ -87,6 +87,7 @@
 	</view>
 </template>
 <script setup lang="ts">
+// @ts-nocheck
 import { ref, computed, onMounted, nextTick } from 'vue'
 import type { Ref } from 'vue'
 import { getMenuCategories, getMenuProducts } from '@/utils/api/menu-mock'
@@ -209,6 +210,7 @@ function openOrderDrawer(product: any) {
 
 // 关闭点单抽屉
 function closeOrderDrawer() {
+
 	orderDrawerVisible.value = false
 	currentProduct.value = null
 }
@@ -232,7 +234,8 @@ function confirmOrder(orderData: any) {
 		id: `${orderData.productId}_${Date.now()}`, // 生成唯一ID
 		name: orderData.productName,
 		price: orderData.totalPrice,
-		image: currentProduct.value.imageUrl,
+		// image: currentProduct.value.imageUrl,
+		// image:orderData.imageUrl,
 		count: orderData.quantity,
 		attrs: [
 			`${getCupLabel(orderData.cup)}`,
@@ -250,6 +253,8 @@ function confirmOrder(orderData: any) {
 		title: '已添加到购物车',
 		icon: 'success'
 	})
+	orderDrawerVisible.value = false
+	currentProduct.value = null
 }
 
 // 辅助函数：获取杯型标签
@@ -531,8 +536,9 @@ onMounted(async () => {
 			flex-direction: column;
 			overflow: hidden;
 			background-color: white;
-			min-height: 100vh;
-			padding-bottom: 60px;
+			// min-height: 100vh;
+			// padding-bottom: 60px;
+
 			.content-scroll {
 				flex: 1;
 				height: 0;

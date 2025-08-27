@@ -21,6 +21,12 @@
         // "enablePullDownRefresh": true
       }
     },
+	{
+	  "path": "pages/menu/submit",
+	  "style": {
+		  "navigationStyle": "custom"
+	  }
+	},
     {
       "path": "pages/order/index",
       "style": {
