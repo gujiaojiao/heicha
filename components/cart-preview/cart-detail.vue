@@ -134,8 +134,36 @@ function formatAttrs(attrs) {
 
 function goToCheckout() {
     closeDetail()
+
+    // 获取当前选中的门店信息
+    const currentStore = {
+        id: 1, // 默认选择第一个门店，实际应该从store或全局状态获取
+        name: '苏州体育中心店',
+        address: '江苏省苏州市虎丘区三香路111号'
+    }
+
+    // 准备要传递的数据
+    const orderData = {
+        cartItems: cartStore.cartList,
+        totalPrice: cartTotal.value,
+        totalCount: cartCount.value,
+        store: currentStore
+    }
+
+    // 使用uni.navigateTo跳转并传递参数
     uni.navigateTo({
-        url: '/pages/menu/submit'
+        url: '/pages/menu/submit',
+        success: (res) => {
+            // 成功跳转后，向目标页面传递数据
+            res.eventChannel.emit('acceptOrderData', orderData)
+        },
+        fail: (err) => {
+            console.error('页面跳转失败：', err)
+            uni.showToast({
+                title: '页面跳转失败',
+                icon: 'none'
+            })
+        }
     })
 }
 

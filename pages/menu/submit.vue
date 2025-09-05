@@ -8,16 +8,57 @@
 			</view>
 		</view>
 		<!-- 内容区域 -->
-		
+
 		<view class="content">
-			lalalal
+			<!-- 门店信息 -->
+			<view class="store-info">
+				<view class="store-title">
+					<uni-icons type="shop" size="20" color="#007f61"></uni-icons>
+					<text class="store-name">{{ storeInfo.name }}</text>
+				</view>
+				<view class="store-address">{{ storeInfo.address }}</view>
+			</view>
+
+			<!-- 商品列表 -->
+			<view class="cart-items">
+				<view class="section-title">已选商品</view>
+				<view class="item" v-for="(item, index) in cartItems" :key="index">
+					<image class="item-image" :src="item.image" mode="aspectFill"></image>
+					<view class="item-info">
+						<view class="item-name">{{ item.name }}</view>
+						<view class="item-attrs" v-if="item.attrs && item.attrs.length">
+							<text>{{ formatAttrs(item.attrs) }}</text>
+						</view>
+						<view class="item-price-count">
+							<text class="item-price">¥{{ item.price.toFixed(2) }}</text>
+							<text class="item-count">x{{ item.count }}</text>
+						</view>
+					</view>
+				</view>
+			</view>
+
+			<!-- 订单信息 -->
+			<view class="order-info">
+				<view class="info-item">
+					<text>商品金额</text>
+					<text>¥{{ totalPrice.toFixed(2) }}</text>
+				</view>
+				<view class="info-item">
+					<text>配送费</text>
+					<text>¥0.00</text>
+				</view>
+				<view class="info-item total">
+					<text>合计</text>
+					<text>¥{{ totalPrice.toFixed(2) }}</text>
+				</view>
+			</view>
 		</view>
-		
+
 		<!-- 底部区域-支付 -->
 		<view class="bottom-fixed">
 			<view class="payNumber">
 				<text>待支付，¥</text>
-				<text>{{total.toFixed(2)}}</text>
+				<text>{{ totalPrice.toFixed(2) }}</text>
 			</view>
 			<button class="recoder-btn" @click="submit">提交订单</button>
 		</view>
@@ -25,26 +66,89 @@
 </template>
 
 <script setup lang='ts'>
-import {ref,onMounted} from 'vue'
+// @ts-ignore
+import { ref, onMounted } from 'vue'
+import { CartItem } from '@/store/cart'
 
-const total=ref<Number>(0)
-// declare const uni: any
-const returnBack=()=>{
-	// uni.navigateBack({delta:1})
+// 声明uni全局变量
+declare const uni: any
+
+// 定义数据
+const cartItems = ref<CartItem[]>([])
+const totalPrice = ref(0)
+const totalCount = ref(0)
+const storeInfo = ref({
+	id: 0,
+	name: '',
+	address: ''
+})
+
+// 格式化商品属性
+const formatAttrs = (attrs: string[]) => {
+	return attrs.join(' / ')
+}
+
+// 返回上一页
+const returnBack = () => {
 	uni.switchTab({ url: '/pages/menu/list' })
 }
+
+// 提交订单
+const submit = () => {
+	if (cartItems.value.length === 0) {
+		uni.showToast({
+			title: '购物车为空',
+			icon: 'none'
+		})
+		return
+	}
+
+	// 这里添加提交订单的逻辑
+	uni.showLoading({
+		title: '提交中...'
+	})
+
+	// 模拟提交
+	setTimeout(() => {
+		uni.hideLoading()
+		uni.showToast({
+			title: '订单提交成功',
+			icon: 'success',
+			success: () => {
+				setTimeout(() => {
+					uni.switchTab({
+						url: '/pages/order/index'
+					})
+				}, 1500)
+			}
+		})
+	}, 1000)
+}
+
+// 页面加载时获取传递的数据
+onMounted(() => {
+	const eventChannel = uni.getOpenerEventChannel()
+	eventChannel.on('acceptOrderData', (data: any) => {
+		console.log('接收到的订单数据:', data)
+		cartItems.value = data.cartItems || []
+		totalPrice.value = data.totalPrice || 0
+		totalCount.value = data.totalCount || 0
+		storeInfo.value = data.store || { id: 0, name: '未知门店', address: '' }
+	})
+})
 </script>
 
 <style lang="scss" scoped>
-.submitOrder{
-	background: white;
+.submitOrder {
+	background: #f7f7f7;
 	height: 100vh;
 	display: flex;
 	flex-direction: column;
 	box-sizing: border-box;
+
 	.fixed-area {
 		flex-shrink: 0; // 防止收缩
-	
+
 		.fixed-header {
 			width: 100%;
 			height: 50px;
@@ -53,7 +157,7 @@ const returnBack=()=>{
 			position: relative;
 			background: white;
 			border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-	
+
 			.back {
 				position: absolute;
 				left: 2%;
@@ -61,7 +165,7 @@ const returnBack=()=>{
 				align-items: center;
 				height: 100%;
 			}
-	
+
 			.orderTitle {
 				position: absolute;
 				left: 50%;
@@ -74,7 +178,123 @@ const returnBack=()=>{
 			}
 		}
 	}
-	
+
+	.content {
+		flex: 1;
+		padding: 20rpx;
+		margin-bottom: 100rpx;
+
+		.store-info {
+			background: white;
+			padding: 30rpx;
+			border-radius: 16rpx;
+			margin-bottom: 20rpx;
+
+			.store-title {
+				display: flex;
+				align-items: center;
+				margin-bottom: 10rpx;
+
+				.store-name {
+					font-size: 32rpx;
+					font-weight: bold;
+					margin-left: 10rpx;
+				}
+			}
+
+			.store-address {
+				font-size: 28rpx;
+				color: #666;
+			}
+		}
+
+		.cart-items {
+			background: white;
+			padding: 30rpx;
+			border-radius: 16rpx;
+			margin-bottom: 20rpx;
+
+			.section-title {
+				font-size: 32rpx;
+				font-weight: bold;
+				margin-bottom: 20rpx;
+			}
+
+			.item {
+				display: flex;
+				padding: 20rpx 0;
+				border-bottom: 1px solid #f0f0f0;
+
+				&:last-child {
+					border-bottom: none;
+				}
+
+				.item-image {
+					width: 120rpx;
+					height: 120rpx;
+					border-radius: 8rpx;
+					margin-right: 20rpx;
+				}
+
+				.item-info {
+					flex: 1;
+					display: flex;
+					flex-direction: column;
+					justify-content: space-between;
+
+					.item-name {
+						font-size: 28rpx;
+						font-weight: 500;
+					}
+
+					.item-attrs {
+						font-size: 24rpx;
+						color: #999;
+						margin: 6rpx 0;
+					}
+
+					.item-price-count {
+						display: flex;
+						justify-content: space-between;
+
+						.item-price {
+							font-size: 28rpx;
+							color: #333;
+							font-weight: bold;
+						}
+
+						.item-count {
+							font-size: 28rpx;
+							color: #666;
+						}
+					}
+				}
+			}
+		}
+
+		.order-info {
+			background: white;
+			padding: 30rpx;
+			border-radius: 16rpx;
+
+			.info-item {
+				display: flex;
+				justify-content: space-between;
+				margin-bottom: 20rpx;
+				font-size: 28rpx;
+				color: #666;
+
+				&.total {
+					font-size: 32rpx;
+					color: #333;
+					font-weight: bold;
+					padding-top: 20rpx;
+					border-top: 1px solid #f0f0f0;
+				}
+			}
+		}
+	}
+
 	.bottom-fixed {
 		position: fixed;
 		bottom: 0;
@@ -84,16 +304,27 @@ const returnBack=()=>{
 		padding: 15px 20px;
 		border-top: 1px solid #eee;
 		z-index: 100;
-	
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		.payNumber {
+			font-size: 32rpx;
+			font-weight: bold;
+		}
+
 		.recoder-btn {
-			width: 30%;
-			height: 50px;
-			background: $alittle-color ;
+			width: 200rpx;
+			height: 80rpx;
+			background: #007f61;
 			color: white;
 			border: none;
-			border-radius: 25px;
-			font-size: 16px;
+			border-radius: 40rpx;
+			font-size: 32rpx;
 			font-weight: bold;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
 	}
 }

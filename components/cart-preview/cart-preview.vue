@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { useCartStore } from '@/store/cart'
+declare const uni: any
 
 const cartStore = useCartStore()
 const { total, count } = storeToRefs(cartStore)
@@ -50,8 +51,29 @@ const onCartClick = () => {
 const onCheckout = () => {
     if (total.value === 0) return
 
+    // 获取当前选中的门店信息
+    const currentStore = {
+        id: 1, // 默认选择第一个门店，实际应该从store或全局状态获取
+        name: '苏州体育中心店',
+        address: '江苏省苏州市虎丘区三香路111号'
+    }
+
+    // 准备要传递的数据
+    const orderData = {
+        cartItems: cartStore.cartList,
+        totalPrice: total.value,
+        totalCount: count.value,
+        store: currentStore
+    }
+
+    // 使用uni.navigateTo跳转并传递参数
     uni.navigateTo({
         url: '/pages/menu/submit',
+        success: (res: any) => {
+            // 成功跳转后，向目标页面传递数据
+            // 注意：这里使用eventChannel传递复杂数据对象
+            res.eventChannel.emit('acceptOrderData', orderData)
+        },
         fail: (err) => {
             console.error('页面跳转失败：', err)
             uni.showToast({
@@ -66,10 +88,10 @@ const onCheckout = () => {
 <style lang="scss" scoped>
 .cart-preview {
     position: fixed;
-	//if weixin
+    //if weixin
     bottom: 30rpx;
-	// else if
-	bottom: 130rpx;
+    // else if
+    bottom: 130rpx;
     left: 40rpx;
     right: 40rpx;
     height: 100rpx;
