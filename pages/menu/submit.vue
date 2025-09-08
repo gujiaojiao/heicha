@@ -74,6 +74,7 @@ import { CartItem } from '@/store/cart'
 declare const uni: any
 
 // 定义数据
+const safeAreaInsets = (uni.getSystemInfoSync && uni.getSystemInfoSync().safeAreaInsets) || { top: 0 }
 const cartItems = ref<CartItem[]>([])
 const totalPrice = ref(0)
 const totalCount = ref(0)
@@ -125,16 +126,88 @@ const submit = () => {
 	}, 1000)
 }
 
+// 初始化页面数据
+const initPageData = () => {
+	try {
+		// 获取页面参数
+		const eventChannel = uni.getOpenerEventChannel?.()
+
+		if (!eventChannel) {
+			console.log('EventChannel不可用，尝试从缓存加载数据')
+			loadDataFromCache()
+			return
+		}
+
+		// 监听数据传递事件
+		eventChannel.on('acceptDataFromOpenerPage', (data: any) => {
+			console.log('通过EventChannel接收到的数据:', data)
+			if (!data) return
+
+			// 更新页面数据
+			if (data.storeInfo) storeInfo.value = data.storeInfo
+			if (data.totalPrice) totalPrice.value = Number(data.totalPrice)
+			if (data.totalCount) totalCount.value = Number(data.totalCount)
+			if (data.cartItems) cartItems.value = data.cartItems
+
+			// 同时保存到缓存，作为备份
+			saveDataToCache(data)
+			console.log('成功接收订单数据')
+		})
+	} catch (error) {
+		console.error('获取EventChannel失败:', error)
+		loadDataFromCache()
+	}
+}
+
+// 从缓存加载数据（作为备用方案）
+const loadDataFromCache = () => {
+	try {
+		const cachedData = uni.getStorageSync('submitOrderData')
+		if (cachedData) {
+			const data = JSON.parse(cachedData)
+			console.log('从缓存加载数据:', data)
+
+			if (data.storeInfo) storeInfo.value = data.storeInfo
+			if (data.totalPrice) totalPrice.value = Number(data.totalPrice)
+			if (data.totalCount) totalCount.value = Number(data.totalCount)
+			if (data.cartItems) cartItems.value = data.cartItems
+
+			console.log('成功从缓存加载数据')
+			return true
+		}
+	} catch (error) {
+		console.error('从缓存加载数据失败:', error)
+	}
+	return false
+}
+
+// 保存数据到缓存
+const saveDataToCache = (data: any) => {
+	try {
+		uni.setStorageSync('submitOrderData', JSON.stringify(data))
+	} catch (error) {
+		console.error('保存数据到缓存失败:', error)
+	}
+}
+
 // 页面加载时获取传递的数据
+const onLoad = () => {
+	console.log('onLoad被调用')
+	initPageData()
+}
+
+// 使用onMounted作为备用初始化方法
 onMounted(() => {
-	const eventChannel = uni.getOpenerEventChannel()
-	eventChannel.on('acceptOrderData', (data: any) => {
-		console.log('接收到的订单数据:', data)
-		cartItems.value = data.cartItems || []
-		totalPrice.value = data.totalPrice || 0
-		totalCount.value = data.totalCount || 0
-		storeInfo.value = data.store || { id: 0, name: '未知门店', address: '' }
-	})
+	console.log('onMounted被调用')
+	// 如果数据还未加载，尝试再次初始化
+	if (cartItems.value.length === 0) {
+		initPageData()
+	}
+})
+
+// 定义页面生命周期
+defineExpose({
+	onLoad
 })
 </script>
 

@@ -317,7 +317,7 @@ function confirmOrder() {
     const orderData = {
         productId: props.productInfo.id,
         productName: props.productInfo.name,
-        // imageurl:props.productInfo.imageUrl,
+        imageurl: props.productInfo.imageUrl,
         cup: selectedCup.value,
         ice: selectedIce.value,
         sugar: selectedSugar.value,
@@ -497,7 +497,8 @@ watch(() => props.visible, (newVal: boolean) => {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 10px;
-				padding-right: 10px;
+                padding-right: 10px;
+
                 .option-item {
                     position: relative;
                     padding: 8px 16px;

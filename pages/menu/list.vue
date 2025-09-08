@@ -235,7 +235,7 @@ function confirmOrder(orderData: any) {
 		name: orderData.productName,
 		price: orderData.totalPrice,
 		// image: currentProduct.value.imageUrl,
-		// image:orderData.imageUrl,
+		image: orderData.imageurl,
 		count: orderData.quantity,
 		attrs: [
 			`${getCupLabel(orderData.cup)}`,
@@ -559,8 +559,8 @@ onMounted(async () => {
 			}
 
 			.product-list {
-				margin: 18px 12px 0 12px;
-
+				margin: 18px 12px 60px 12px;
+				padding-bottom: 180px;
 				.category-section {
 					margin-bottom: 20px;
 

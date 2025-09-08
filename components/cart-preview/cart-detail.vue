@@ -21,7 +21,7 @@
                     <view class="item-info">
                         <view class="item-header">
                             <text class="item-name">{{ item.name }}</text>
-                            <text class="item-price">¥{{ item.price.toFixed(2) }}</text>
+                            <text class="item-price">¥{{ (item.price * item.count).toFixed(2) }}</text>
                         </view>
                         <view class="item-spec" v-if="item.attrs && item.attrs.length > 0">
                             <text class="spec-text">{{ formatAttrs(item.attrs) }}</text>
@@ -100,6 +100,7 @@ function clearCart() {
 
 function increaseQuantity(index) {
     const item = cartItems.value[index]
+    // item.price=(item.count+1)*item.price
     cartStore.updateItemCount(index, item.count + 1)
 }
 
@@ -251,11 +252,14 @@ watch(() => props.visible, (newVal) => {
         flex: 1;
         padding: 0 20px;
         overflow-y: auto;
+        width: 100%;
+        box-sizing: border-box;
 
         .cart-item {
             display: flex;
             padding: 15px 0;
             border-bottom: 1px solid #f5f5f5;
+            width: 100%;
 
             .item-image {
                 width: 60px;

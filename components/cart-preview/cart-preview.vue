@@ -60,21 +60,33 @@ const onCheckout = () => {
 
     // 准备要传递的数据
     const orderData = {
-        cartItems: cartStore.cartList,
+        storeInfo: currentStore,
         totalPrice: total.value,
         totalCount: count.value,
-        store: currentStore
+        cartItems: cartStore.cartList
     }
 
-    // 使用uni.navigateTo跳转并传递参数
+    // 同时将数据保存到缓存，作为备份
+    try {
+        uni.setStorageSync('submitOrderData', JSON.stringify(orderData))
+    } catch (error) {
+        console.error('保存数据到缓存失败:', error)
+    }
+
+    // 使用EventChannel方式传递数据
     uni.navigateTo({
         url: '/pages/menu/submit',
-        success: (res: any) => {
-            // 成功跳转后，向目标页面传递数据
-            // 注意：这里使用eventChannel传递复杂数据对象
-            res.eventChannel.emit('acceptOrderData', orderData)
+        events: {
+            // 接收submit页面发送的数据
+            acceptDataFromSubmitPage(data: any) {
+                console.log('接收到submit页面的数据:', data);
+            }
         },
-        fail: (err) => {
+        success: (res: any) => {
+            // 通过eventChannel向被打开页面传送数据
+            res.eventChannel.emit('acceptDataFromOpenerPage', orderData);
+        },
+        fail: (err: any) => {
             console.error('页面跳转失败：', err)
             uni.showToast({
                 title: '页面跳转失败',
@@ -88,10 +100,12 @@ const onCheckout = () => {
 <style lang="scss" scoped>
 .cart-preview {
     position: fixed;
-    //if weixin
+    /* #ifdef MP-WEIXIN */
     bottom: 30rpx;
-    // else if
+    /* #endif */
+    /* #ifndef MP-WEIXIN */
     bottom: 130rpx;
+    /* #endif */
     left: 40rpx;
     right: 40rpx;
     height: 100rpx;
