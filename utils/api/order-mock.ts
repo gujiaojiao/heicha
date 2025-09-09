@@ -10,16 +10,19 @@ export interface OrderProduct {
   // 当前订单类型
 export interface CurrentOrder {
     id: number;
-    storeAddress: string;    // 店名
-    takeNumber: string;      // 取餐号
-    totalCups: number;       // 本单总杯数
-    products: OrderProduct[];// 订单详情
-    storeTotalCups: number;  // 店家当前总共要完成的杯数
-    waitCups: number;        // 还剩余几杯到你
-    status: string;          // 完成状态（如“制作中”、“待取餐”、“已完成”）
+    storeAddress: string;
+    takeNumber: string;
+    totalCups: number;
+    products: OrderProduct[];
+    storeTotalCups: number;
+    waitCups: number;
+    status: string;
   }
-//   历史订单类型
-  export interface OrderHistory {
+
+// 声明uni全局变量
+declare const uni: any;
+  
+export interface OrderHistory {
     id: number;
     storeAddress: string;
     orderTime: string;
@@ -27,6 +30,7 @@ export interface CurrentOrder {
     type: string;
     products: OrderProduct[];
     totalPrice: number;
+
     buttonText: string;
   }
 
@@ -99,7 +103,23 @@ export const getOrderHistory = (): Promise<OrderHistory[]> => {
 }
 
 // 获取当前订单
-export const getCurrentOrder = (): Promise<CurrentOrder> => {
+export const getCurrentOrder = () => {
+  // 从本地存储中获取当前订单数据
+  try {
+    const currentOrderStr = uni.getStorageSync('currentOrder');
+    console.log('currentOrderStr', currentOrderStr);
+    if (currentOrderStr) {
+      return Promise.resolve(JSON.parse(currentOrderStr));
+    }
+  } catch (error) {
+    console.error('获取当前订单数据失败:', error);
+  }
+  
+  // 如果没有本地存储的订单数据，返回空对象
+  return Promise.resolve({});
+  
+  // 测试数据，需要时可以取消注释使用
+  /*
   return Promise.resolve({
     id: 101,
     storeAddress: "苏州创业园店",
@@ -123,8 +143,9 @@ export const getCurrentOrder = (): Promise<CurrentOrder> => {
     ],
     storeTotalCups: 8,   // 店家当前总共要做8杯
     waitCups: 3,         // 还剩3杯到你
-    status: "制作中"      // 也可以是“待取餐”、“已完成”
+    status: "制作中"      // 也可以是"待取餐"、"已完成"
   })
+  */
 }
 
 // 订单详情类型（扩展历史订单信息）

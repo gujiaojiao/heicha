@@ -310,7 +310,6 @@ function shareProduct() {
 function closeDrawer() {
     console.log(111)
     emit('close')
-    console.log(111, '有被调用')
 }
 
 function confirmOrder() {

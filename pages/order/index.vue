@@ -15,9 +15,26 @@
 		<view class="content-area" :style="{ paddingTop: safeAreaInsets.top + 80 + 'px' }">
 			<!-- 当前订单 -->
 			<view class="currentOrder" v-if="activeTab === 0">
-				<view class="noCurrentOrder">
-					当前尚未有进行中的订单<br></br>
-					快去点一杯ba~
+				<!-- 无订单状态 -->
+				<view class="noCurrentOrder" v-if="currentOrderState === 0">
+					<view class="animation-container">
+						<!-- 使用图片组合实现动画效果 -->
+						<view class="loading-animation">
+							<view class="dot dot1"></view>
+							<view class="dot dot2"></view>
+							<view class="dot dot3"></view>
+							<view class="dot dot4"></view>
+							<view class="dot dot5"></view>
+						</view>
+					</view>
+					<view class="empty-text">
+						当前尚未有进行中的订单<br>
+						快去点一杯ba~
+					</view>
+				</view>
+				<!-- 有订单状态 -->
+				<view class="existOrder" v-if="currentOrderState === 1 && currentOrder">
+					<CurrentOrder :orderInfo="currentOrder" />
 				</view>
 			</view>
 			<!-- 历史订单 -->
@@ -43,21 +60,21 @@
 									<span style="font-size: 14px;">{{ item.products[0].desc }}</span>
 								</view>
 								<view class="total">
-									<span
-										style="font-size: 18px;font-weight: 600;">{{ item.totalPrice.toFixed(2) }}</span>
+									<span style="font-size: 18px;font-weight: 600;">{{ item.totalPrice.toFixed(2)
+									}}</span>
 									<span>共{{ item.products.length }}件</span>
 								</view>
 							</view>
 						</view>
 						<!-- 订单有多杯 -->
 						<view v-if="item.products.length > 1">
-								<view class="product-list">
-									<view v-for="pItem in item.products" :key="pItem.index">
+							<view class="product-list">
+								<view v-for="pItem in item.products" :key="pItem.index">
 									<image class="prod-img" :src="pItem.imageUrl" mode="aspectFill" />
 								</view>
 								<view class="total">
-									<span
-										style="font-size: 18px;font-weight: 600;">{{ item.totalPrice.toFixed(2) }}</span>
+									<span style="font-size: 18px;font-weight: 600;">{{ item.totalPrice.toFixed(2)
+									}}</span>
 									<span>共{{ item.products.length }}件</span>
 								</view>
 							</view>
@@ -77,10 +94,16 @@
 // @ts-ignore
 import { ref, onMounted } from 'vue'
 import { getCurrentOrder, getOrderHistory } from '@/utils/api/order-mock'
+import CurrentOrder from '@/components/current-order'
+
+// 声明uni类型
+declare const uni: any
 
 const safeAreaInsets = (uni.getSystemInfoSync && uni.getSystemInfoSync().safeAreaInsets || { top: 0 })
 const activeTab = ref(0)
 const historyOrder = ref([])
+const currentOrderState = ref(0)
+const currentOrder = ref(null)
 
 // 切换tab
 const switchTab = (tabIndex: number) => {
@@ -88,21 +111,21 @@ const switchTab = (tabIndex: number) => {
 	loadData()
 }
 
-const handleToDetail=(id:any)=>{
-	const url='/pages/order/historyOrderDetail?id='+id
+const handleToDetail = (id: string | number) => {
+	const url = '/pages/order/historyOrderDetail?id=' + id
 	uni.navigateTo({
 		url,
-		fail: (err) => {
+		fail: (err: any) => {
 			console.error('页面跳转失败')
 		}
 	})
-	
+
 }
-const handleToMenu=()=>{
-	const url='/pages/menu/index'
+const handleToMenu = () => {
+	const url = '/pages/menu/index'
 	uni.navigateTo({
 		url,
-		fail: (err) => {
+		fail: (err: any) => {
 			console.error('页面跳转失败')
 		}
 	})
@@ -112,7 +135,16 @@ const handleToMenu=()=>{
 const loadData = () => {
 	if (activeTab.value === 0) {
 		getCurrentOrder().then(res => {
-			console.log('当前订单数据：', res)
+			currentOrder.value = res
+			// 判断是否有订单
+			if (res && Object.keys(res).length > 0) {
+				currentOrderState.value = 1 // 有订单
+			} else {
+				currentOrderState.value = 0 // 无订单
+			}
+		}).catch(err => {
+			console.error('获取当前订单失败:', err)
+			currentOrderState.value = 0 // 发生错误时默认无订单
 		})
 	} else {
 		getOrderHistory().then(res => {
@@ -140,7 +172,7 @@ onMounted(() => {
 		left: 0;
 		right: 0;
 		z-index: 100;
-		background: #f7f7f7;
+		background: white;
 
 		.orderTitle {
 			display: flex;
@@ -195,17 +227,69 @@ onMounted(() => {
 
 		.currentOrder {
 			padding: 15px 10px;
-			
-			.noCurrentOrder{
+			height: 100%;
+
+			.noCurrentOrder {
 				width: 100%;
-				height: 50px;
-				background-color: #1aad19;
-				// display: flex;
-				position: relative;
-				left:50%;
-				top:50%;
-				transform: translate(-50%,-50%);
-				text-align: center;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+
+				.animation-container {
+					width: 200px;
+					margin-bottom: 20px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+
+					.loading-animation {
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						gap: 8px;
+
+						.dot {
+							width: 20px;
+							height: 20px;
+							border-radius: 4px;
+							animation: pulse 1.5s infinite ease-in-out;
+
+							&.dot1 {
+								background-color: #0b5d1e;
+								animation-delay: 0s;
+							}
+
+							&.dot2 {
+								background-color: #127a29;
+								animation-delay: 0.2s;
+							}
+
+							&.dot3 {
+								background-color: #1aad19;
+								animation-delay: 0.4s;
+							}
+
+							&.dot4 {
+								background-color: #7fbc26;
+								animation-delay: 0.6s;
+							}
+
+							&.dot5 {
+								background-color: #c0e086;
+								animation-delay: 0.8s;
+							}
+						}
+					}
+				}
+
+				.empty-text {
+					text-align: center;
+					color: #007f61;
+					font-size: 16px;
+					line-height: 1.6;
+				}
 			}
 		}
 
@@ -237,10 +321,11 @@ onMounted(() => {
 						flex-direction: row;
 						justify-content: space-between;
 					}
-					.orderWay{
+
+					.orderWay {
 						width: 12%;
 						text-align: center;
-						background-color: rgba(174, 213, 129,0.5);
+						background-color: rgba(174, 213, 129, 0.5);
 						border-radius: 5px;
 					}
 				}
@@ -295,6 +380,20 @@ onMounted(() => {
 				}
 			}
 		}
+	}
+}
+
+@keyframes pulse {
+
+	0%,
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
+
+	50% {
+		transform: scale(0.8);
+		opacity: 0.8;
 	}
 }
 </style>

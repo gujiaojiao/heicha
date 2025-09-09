@@ -1,5 +1,5 @@
 <template>
-	<view class="submitOrder">
+	<view class="submitOrder" :style="{ paddingTop: safeAreaInsets.top + 'px' }">
 		<!-- 固定顶部区域 -->
 		<view class="fixed-area">
 			<view class="fixed-header">
@@ -69,6 +69,9 @@
 // @ts-ignore
 import { ref, onMounted } from 'vue'
 import { CartItem } from '@/store/cart'
+import { useCartStore } from '@/store/cart'
+
+
 
 // 声明uni全局变量
 declare const uni: any
@@ -88,7 +91,8 @@ const storeInfo = ref({
 const formatAttrs = (attrs: string[]) => {
 	return attrs.join(' / ')
 }
-
+// 购物车store
+const cartStore = useCartStore()
 // 返回上一页
 const returnBack = () => {
 	uni.switchTab({ url: '/pages/menu/list' })
@@ -112,10 +116,38 @@ const submit = () => {
 	// 模拟提交
 	setTimeout(() => {
 		uni.hideLoading()
+
+		// 创建当前订单数据
+		const currentOrderData = {
+			id: new Date().getTime(),
+			storeAddress: storeInfo.value.name,
+			takeNumber: "A" + Math.floor(Math.random() * 900 + 100), // 生成随机取餐号
+			totalCups: cartItems.value.reduce((sum: number, item: CartItem) => sum + item.count, 0),
+			products: cartItems.value.map((item: CartItem) => ({
+				name: item.name,
+				imageUrl: item.image,
+				desc: formatAttrs(item.attrs || []),
+				count: item.count,
+				price: item.price
+			})),
+			storeTotalCups: Math.floor(Math.random() * 10) + 5, // 随机生成5-15杯
+			waitCups: Math.floor(Math.random() * 5), // 随机生成0-4杯
+			status: "制作中"
+		}
+
+		// 保存当前订单到本地存储
+		try {
+			uni.setStorageSync('currentOrder', JSON.stringify(currentOrderData))
+		} catch (error) {
+			console.error('保存当前订单数据失败:', error)
+		}
+
 		uni.showToast({
 			title: '订单提交成功',
 			icon: 'success',
 			success: () => {
+				// 清空购物车
+				cartStore.clearCart()
 				setTimeout(() => {
 					uni.switchTab({
 						url: '/pages/order/index'
@@ -213,16 +245,22 @@ defineExpose({
 
 <style lang="scss" scoped>
 .submitOrder {
-	background: #f7f7f7;
+	background: white;
 	height: 100vh;
 	display: flex;
 	flex-direction: column;
 	box-sizing: border-box;
 
 	.fixed-area {
+		// position: fixed;
 		flex-shrink: 0; // 防止收缩
 
 		.fixed-header {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 100;
 			width: 100%;
 			height: 50px;
 			display: flex;
@@ -256,6 +294,7 @@ defineExpose({
 		flex: 1;
 		padding: 20rpx;
 		margin-bottom: 100rpx;
+		background-color: #f7f7f7;
 
 		.store-info {
 			background: white;
