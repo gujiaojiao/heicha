@@ -10,7 +10,7 @@
             <!-- 用户信息区域 -->
             <view class="user-info" v-if="userInfo">
                 <view class="user-info__main">
-                    <image class="avatar" :src="userInfo.avatar" mode="aspectFill" />
+                    <image class="avatar" :src="userInfo.avatar" mode="aspectFill" @click="UserInfoDetails()" />
                     <view class="info">
                         <text class="nickname">{{ userInfo.nickname }}</text>
                         <text class="member-code">{{ userInfo.memberCode }}</text>
@@ -23,7 +23,7 @@
                     </view>
                     <view class="stat-item">
                         <text class="value">{{ userInfo.coupons }}</text>
-                        <text class="label">卡券</text>
+                        <text class="label">卡券</text>@
                     </view>
                 </view>
             </view>
@@ -127,6 +127,10 @@ const navigateTo = (url: string) => {
     })
 }
 
+const UserInfoDetails=()=>{
+	
+	navigateTo('/pages/info/index')
+}
 // 生命周期
 onMounted(() => {
     loadData()

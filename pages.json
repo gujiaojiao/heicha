@@ -45,7 +45,13 @@
       "style": {
        "navigationStyle": "custom"
       }
-    }
+    },
+	{
+	  "path": "pages/info/index",
+	  "style": {
+	   "navigationStyle": "custom"
+	  }
+	}
 	
   ],
   // "subPackages": [
