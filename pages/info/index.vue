@@ -19,6 +19,30 @@
 			<!-- 资料部分 -->
 			<view class="userInfomation">
 				<span>我的资料</span>
+				<view class="infoDetails">
+					<view class="infoDetailsItem">
+						<span style="margin-right: 20px;font-size: 20px;">昵称</span>
+						<input class="uni-input" type="number" placeholder="请输入昵称" />
+					</view>
+					<view class="infoDetailsItem">
+						<span style="margin-right: 20px;font-size: 20px;">手机</span>
+						<input class="uni-input" type="number" placeholder="请输入昵称" :style="{Width:'45%'}"/>
+						<button type="default" plain="true" style="color:#1AAD19;borderColor:#1AAD19">更换手机号</button>
+					</view>
+					<view class="infoDetailsItem">
+						<span style="margin-right: 20px;font-size: 20px;">生日</span>
+						<input class="uni-input" type="number" placeholder="请输入昵称" />
+					</view>
+					<view class="infoDetailsItem">
+						<span style="margin-right: 20px;font-size: 20px;">性别</span>
+						<input class="uni-input" type="number" placeholder="请输入昵称" />
+					</view>
+					<view class="infoDetailsItem">
+						<span style="margin-right: 20px;font-size: 20px;">城市</span>
+						<input class="uni-input" type="number" placeholder="请输入昵称" />
+					</view>
+					
+				</view>
 			</view>
 		</view>
 	</view>
@@ -128,6 +152,22 @@ onMounted(() => {
 	
 		.userInfomation{
 			margin: 15px 15px 0 15px;
+			.infoDetails{
+				margin: 10px 0;
+				padding: 10px 18px;
+				background-color: white;
+				border-radius: 10px;
+			}
+			.infoDetailsItem{
+				padding: 20px 10px;
+				display:flex;
+				align-items: center;
+				line-height: 35px;
+				color: black;
+			}
+			.infoDetailsItem:not(:last-child){
+				border-bottom: 1px solid gray;
+			}
 		}
 	}
 }
