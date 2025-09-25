@@ -1,9 +1,9 @@
 <template>
   <view class="mine">
     <view v-if="!isLoggedIn" class="login-box">
-		<view>
-			当前尚未登录~
-		</view>
+      <view>
+        当前尚未登录~
+      </view>
       <button type="primary" plain="true" @click="handleLogin" style="border-color: #007f61;color: #007f61;">去登录</button>
     </view>
     <view v-show="isLoggedIn">
@@ -144,16 +144,29 @@ const loadData = async () => {
 
 // 页面跳转
 const navigateTo = (url: string) => {
-  uni.navigateTo({
-    url,
-    fail: (err: UniApp.NavigateToFailCallback) => {
-      console.error("页面跳转失败：", err);
-      uni.showToast({
-        title: "页面跳转失败",
-        icon: "none",
-      });
-    },
-  });
+  const tabBarPages = [
+    "/pages/index/index",
+    "/pages/menu/index",
+    "/pages/mine/index",
+    "/pages/order/index",
+  ];
+  const isTabBarPage =
+    tabBarPages.includes(url) ||
+    tabBarPages.some((page) => url.startsWith(page + "?"));
+  if (isTabBarPage) {
+    uni.switchTab({ url });
+  } else {
+    uni.navigateTo({
+      url,
+      fail: (err: UniApp.NavigateToFailCallback) => {
+        console.error("页面跳转失败：", err);
+        uni.showToast({
+          title: "页面跳转失败",
+          icon: "none",
+        });
+      },
+    });
+  }
 };
 
 const UserInfoDetails = () => {
@@ -179,8 +192,8 @@ onMounted(() => {
 
   .login-box {
     display: flex;
-	flex-direction: column;
-	height: 100vh;
+    flex-direction: column;
+    height: 100vh;
     justify-content: center;
     align-items: center;
     background: #fff;

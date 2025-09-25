@@ -51,6 +51,12 @@
 	  "style": {
 	   "navigationStyle": "custom"
 	  }
+	},
+	{
+	  "path": "pages/address/index",
+	  "style": {
+	   "navigationStyle": "custom"
+	  }
 	}
 	
   ],

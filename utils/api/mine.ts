@@ -1,9 +1,14 @@
 export interface MineUserInfo {
   avatar: string
   nickname: string
+  /** 手机号码 */
   memberCode: string
   points: number
   coupons: number
+  phone: string
+  birthday: string
+  gender: string
+  region: string[]
 }
 
 export interface MemberInfo {
@@ -33,13 +38,20 @@ export interface MineFunction {
 export const getMineUserInfo = (): Promise<MineUserInfo> => {
   return Promise.resolve({
     avatar: '/static/images/index/xiaoxin.png',
-    nickname: '嗨, J.',
-    memberCode: '182****2800',
+    nickname: 'J.',
+    memberCode: '182****2800', // 手机号码
     points: 278,
-    coupons: 7
+    coupons: 7,
+    phone: '182****2800',
+    birthday: '',
+    gender: '女',
+    region: ['', '', '']
   })
 }
-
+export const updateMineUserInfo = (info: MineUserInfo): Promise<boolean> => {
+  // 实际项目应调用后端接口，这里仅模拟
+  return Promise.resolve(true)
+}
 export const getMemberInfo = (): Promise<MemberInfo> => {
   return Promise.resolve({
     level: '黄金点门人会员',
@@ -87,7 +99,7 @@ export const getMineFunctions = (): Promise<MineFunction[]> => {
       id: 1,
       title: '我的订单',
       icon: '/static/images/mine/myOrder.png',
-      link: '/pages/order/list'
+      link: '/pages/order/index'
     },
     {
       id: 2,
